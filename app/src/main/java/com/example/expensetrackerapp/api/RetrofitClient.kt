@@ -20,54 +20,33 @@ class RetrofitClient(context: Context) {
         level = HttpLoggingInterceptor.Level.BODY
     }
 
-    // Create an OkHttpClient and add the logging interceptor
-//    fun createRetrofit() {
-//        val client = OkHttpClient.Builder()
-//            .addInterceptor(JwtInterceptor(context))
-//            .build()
-//
-//        val gson = GsonBuilder()
-//            .setLenient()
-//            .create()
-//
-//        val retrofitObj by lazy {
-//            Retrofit.Builder()
-//                .baseUrl(BASE_URL)
-//                .client(client)  // Add the OkHttpClient to Retrofit
-//                .addConverterFactory(GsonConverterFactory.create(gson))  // Use Gson for JSON conversion
-//                .build()
-//        }
-//        retrofit = retrofitObj
-//    }
-
-    val client = OkHttpClient.Builder()
+    private val client = OkHttpClient.Builder()
         .addInterceptor(JwtInterceptor(context))
         .build()
 
     private val loginClient = OkHttpClient.Builder().build()
 
-    val gson = GsonBuilder()
+    private val gson = GsonBuilder()
         .setLenient()
         .create()
 
     private val retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(client)  // Add the OkHttpClient to Retrofit
-            .addConverterFactory(GsonConverterFactory.create(gson))  // Use Gson for JSON conversion
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 
     private val loginRetrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(loginClient)  // Add the OkHttpClient to Retrofit
-            .addConverterFactory(GsonConverterFactory.create(gson))  // Use Gson for JSON conversion
+            .client(loginClient)
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 
 
-    // Create instances of your API interfaces
     val authApi: AuthApi by lazy {
         loginRetrofit.create(AuthApi::class.java)
     }

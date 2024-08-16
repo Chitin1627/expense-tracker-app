@@ -6,6 +6,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.expensetrackerapp.data.getToken
+import com.example.expensetrackerapp.screens.MainScreen
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun ExpenseTrackerApp(
@@ -19,8 +23,6 @@ fun ExpenseTrackerApp(
             appViewModel.setUsernamePassword(username, password)
             appViewModel.performLogin(
                 context = context,
-//                username = appUiState.username,
-//                password = appUiState.password,
                 onSuccess = { token ->
                     println("Token: $token")
                     val sharedToken = getToken(context)
@@ -30,6 +32,14 @@ fun ExpenseTrackerApp(
                     println("Error: $error")
                 }
             )
+        },
+        validateToken = {
+            val token = getToken(context)
+            if (token != null) {
+                appViewModel.setToken(token)
+            }
+            appViewModel.validateToken(context)
+            appUiState.isTokenValid
         }
     )
 }

@@ -6,6 +6,7 @@ import com.example.expensetrackerapp.api.RetrofitClient
 import com.example.expensetrackerapp.data.ExpenseTrackerUiState
 import com.example.expensetrackerapp.data.saveToken
 import com.example.expensetrackerapp.model.Expense
+import com.example.expensetrackerapp.model.JwtToken
 import com.example.expensetrackerapp.model.LoginRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,6 +50,14 @@ class ExpenseTrackerViewModel : ViewModel() {
         }
     }
 
+    fun setToken(token: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                token = token
+            )
+        }
+    }
+
     fun performLogin(context: Context, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         val retrofitClient = RetrofitClient(context)
         val api = retrofitClient.authApi
@@ -64,6 +73,31 @@ class ExpenseTrackerViewModel : ViewModel() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     onError(e.message ?: "An error occurred")
+                }
+            }
+        }
+    }
+
+     fun validateToken(context: Context) {
+        val retrofitClient = RetrofitClient(context)
+        val api = retrofitClient.authApi
+        val token = uiState.value.token
+        var isValid = false
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = api.validateToken(JwtToken(token))
+                println("isValid: $response")
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isTokenValid = true
+                    )
+                }
+            } catch (e: Exception) {
+                println(e.message)
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        isTokenValid = false
+                    )
                 }
             }
         }
