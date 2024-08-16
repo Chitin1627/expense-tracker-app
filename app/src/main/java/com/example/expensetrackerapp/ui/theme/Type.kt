@@ -15,7 +15,6 @@ val Typography = Typography(
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp,
-        color = Color.White
     ),
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,
@@ -23,7 +22,6 @@ val Typography = Typography(
         fontSize = 30.sp,
         lineHeight = 36.sp,
         letterSpacing = 0.sp,
-        color = Green
     ),
     titleMedium = TextStyle(
         fontFamily = FontFamily.Default,
@@ -31,7 +29,6 @@ val Typography = Typography(
         fontSize = 24.sp,
         lineHeight = 32.sp,
         letterSpacing = 0.sp,
-        color = LightGreen
     ),
     labelLarge = TextStyle(
         fontFamily = FontFamily.Default,
@@ -39,7 +36,6 @@ val Typography = Typography(
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp,
-        color = Color.White
     )
     // Add more styles as needed
 )
