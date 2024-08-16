@@ -37,10 +37,11 @@ import retrofit2.Callback
 import retrofit2.Response
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    loginOnClick: (String, String) -> Unit
+) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -60,68 +61,11 @@ fun LoginScreen() {
             },
             visualTransformation = PasswordVisualTransformation()
         )
-        Button(onClick = {
-            val isValid = performLogin(
-                context = context,
-                username = username,
-                password = password,
-                onSuccess = { token ->
-                    println("Token: $token")
-                    val sharedToken = getToken(context)
-                    println("Shared Pref: $sharedToken")
-                },
-                onError = { error ->
-                    println("Error: $error")
-                }
-            )
-        }) {
+        Button(onClick = { loginOnClick(username, password) }
+        ) {
             Text(text = "LOGIN")
         }
     }
 }
 
 
-//fun fetchLoginResponse(username:String,
-//                       password:String,
-//                       context: Context,
-//                       onSuccess: (String) -> Unit,
-//                       onError: (Throwable) -> Unit
-//) {
-//    CoroutineScope(Dispatchers.IO).launch {
-//        try {
-//            val loginRequest: LoginRequest = LoginRequest(username, password)
-//            val token = RetrofitClient(context).authApi.login(loginRequest)
-//            CoroutineScope(Dispatchers.Main).launch {
-//                onSuccess(token)
-//            }
-//        } catch (e: Exception) {
-//            onError(e)
-//        }
-//    }
-//}
-
-fun performLogin(context: Context, username: String, password: String, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
-    val retrofitClient = RetrofitClient(context)
-    val api = retrofitClient.authApi
-
-    // Launch a coroutine on IO dispatcher for background work
-    CoroutineScope(Dispatchers.IO).launch {
-        try {
-            // Make the API call and get the token
-            val token = api.login(LoginRequest(username, password))
-
-            // Save the token locally
-            saveToken(context, token)
-
-            // Switch to the Main thread to handle UI-related tasks
-            withContext(Dispatchers.Main) {
-                onSuccess(token)
-            }
-        } catch (e: Exception) {
-            // Handle the error, switch to Main thread for UI-related tasks
-            withContext(Dispatchers.Main) {
-                onError(e.message ?: "An error occurred")
-            }
-        }
-    }
-}

@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.expensetrackerapp.api.RetrofitClient
 import com.example.expensetrackerapp.data.getToken
+import com.example.expensetrackerapp.data.removeToken
+import com.example.expensetrackerapp.data.saveToken
 import com.example.expensetrackerapp.model.Expense
 import com.example.expensetrackerapp.model.JwtToken
 import com.example.expensetrackerapp.screens.LoginScreen
@@ -38,7 +40,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen(context = this)
+                    ExpenseTrackerApp()
                 }
             }
         }
@@ -46,31 +48,33 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(context: Context) {
+fun MainScreen(
+    context: Context,
+    loginOnClick: (String, String) -> Unit
+) {
     // State to track whether token is valid or not
     var isTokenValid by remember { mutableStateOf<Boolean?>(null) }
 
     // Coroutine scope for background work
     val scope = rememberCoroutineScope()
-
     // Validate the token when the composable is first displayed
     LaunchedEffect(Unit) {
         scope.launch {
             val token = getToken(context)
             println("Current token: $token")
-            if (token != null) {
+            isTokenValid = if (token != null) {
                 // Check token validity
                 val isValid = validateToken(context, token)
-                isTokenValid = isValid
+                isValid
             } else {
-                isTokenValid = false
+                false
             }
         }
     }
     println(isTokenValid)
     when (isTokenValid) {
-        true -> Greeting("Pra")  // Show greeting if token is valid
-        else -> LoginScreen()  // Show login if token is invalid or absent
+        true -> Greeting("Pra")
+        else -> LoginScreen(loginOnClick = loginOnClick)
     }
 }
 
