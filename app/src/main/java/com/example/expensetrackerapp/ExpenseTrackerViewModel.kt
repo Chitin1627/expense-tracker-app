@@ -2,6 +2,7 @@ package com.example.expensetrackerapp
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.expensetrackerapp.api.RetrofitClient
 import com.example.expensetrackerapp.data.ExpenseTrackerUiState
 import com.example.expensetrackerapp.data.saveToken
@@ -10,6 +11,7 @@ import com.example.expensetrackerapp.model.JwtToken
 import com.example.expensetrackerapp.model.LoginRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -82,22 +84,25 @@ class ExpenseTrackerViewModel : ViewModel() {
         val retrofitClient = RetrofitClient(context)
         val api = retrofitClient.authApi
         val token = uiState.value.token
-        var isValid = false
-        CoroutineScope(Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = api.validateToken(JwtToken(token))
                 println("isValid: $response")
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        isTokenValid = true
-                    )
+                withContext(Dispatchers.Main) {
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            isTokenValid = response.equals("true")
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 println(e.message)
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        isTokenValid = false
-                    )
+                withContext(Dispatchers.Main) {
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            isTokenValid = false
+                        )
+                    }
                 }
             }
         }
