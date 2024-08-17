@@ -8,12 +8,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.example.expensetrackerapp.data.getToken
+import com.example.expensetrackerapp.data.removeToken
+import kotlinx.coroutines.delay
 
 @Composable
 fun MainScreen(
     context: Context,
     loginOnClick: (String, String) -> Unit,
-    validateToken: () -> Boolean,
+    validateToken: suspend () -> Boolean,
     goToHome: () -> Unit
 ) {
     //removeToken(context)
@@ -25,13 +27,14 @@ fun MainScreen(
             try {
                 validateToken()
             } catch (e: Exception) {
+                println("mainscreen: ${e.message}")
                 false
             }
         } else {
             false
         }
     }
-    println(isTokenValid)
+    println("IsTokenValid: $isTokenValid")
     when (isTokenValid) {
         true -> goToHome()
         false -> LoginScreen(loginOnClick = loginOnClick)

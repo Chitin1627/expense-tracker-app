@@ -3,8 +3,12 @@ package com.example.expensetrackerapp
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -16,6 +20,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.expensetrackerapp.components.appbar.BottomNavBar
 import com.example.expensetrackerapp.components.appbar.BottomNavItem
 import com.example.expensetrackerapp.data.getToken
+import com.example.expensetrackerapp.screens.HomeScreen
+import com.example.expensetrackerapp.screens.LoadingScreen
 import com.example.expensetrackerapp.screens.MainScreen
 
 
@@ -47,7 +53,18 @@ fun ExpenseTrackerApp(
         }
     ) { innerPadding ->
         NavHost(navController = navController, startDestination = BottomNavItem.Validating.route, Modifier.padding(innerPadding)) {
-            composable(BottomNavItem.Home.route) { Greeting(name = "HOME") }
+            composable(BottomNavItem.Home.route) {
+                var isLoading by remember { mutableStateOf(true) }
+                LaunchedEffect(Unit) {
+                    appViewModel.getExpensesFromApi(context)
+                    isLoading = false
+                }
+                if (isLoading) {
+                    LoadingScreen()
+                } else {
+                    HomeScreen(expenses = appViewModel.getExpenses())
+                }
+            }
             composable(BottomNavItem.Statistics.route) { Greeting(name = "STATS")}
             composable(BottomNavItem.Profile.route) { Greeting(name = "PROFILE") }
             composable(BottomNavItem.Validating.route) {
@@ -58,9 +75,6 @@ fun ExpenseTrackerApp(
                         appViewModel.performLogin(
                             context = context,
                             onSuccess = { token ->
-                                println("Token: $token")
-                                val sharedToken = getToken(context)
-                                println("Shared Pref: $sharedToken")
                                 navController.navigate(BottomNavItem.Home.route) {
                                     popUpTo(navController.graph.startDestinationId) {
                                         saveState = true
@@ -74,13 +88,13 @@ fun ExpenseTrackerApp(
                             }
                         )
                     },
-                    validateToken = {
+                    validateToken = suspend {
                         val token = getToken(context)
                         if (token != null) {
                             appViewModel.setToken(token)
                         }
-                        appViewModel.validateToken(context)
-                        appUiState.isTokenValid
+                        val isValid = appViewModel.validateToken(context)
+                        appViewModel.isTokenValid()
                     },
                     goToHome = {
                         navController.navigate(BottomNavItem.Home.route) {
@@ -95,5 +109,4 @@ fun ExpenseTrackerApp(
             }
         }
     }
-
 }

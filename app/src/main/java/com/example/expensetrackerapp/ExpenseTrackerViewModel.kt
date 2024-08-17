@@ -40,6 +40,10 @@ class ExpenseTrackerViewModel : ViewModel() {
         }
     }
 
+    fun getExpenses(): List<Expense> {
+        return uiState.value.expenses
+    }
+
     fun setTotalExpense(expenses: List<Expense>) {
         var totalExpense: Double = 0.0
         expenses.forEach { expense ->
@@ -58,6 +62,10 @@ class ExpenseTrackerViewModel : ViewModel() {
                 token = token
             )
         }
+    }
+
+    fun isTokenValid(): Boolean {
+        return uiState.value.isTokenValid
     }
 
     fun performLogin(context: Context, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
@@ -80,30 +88,51 @@ class ExpenseTrackerViewModel : ViewModel() {
         }
     }
 
-     fun validateToken(context: Context) {
+     suspend fun validateToken(context: Context): Boolean{
+         val retrofitClient = RetrofitClient(context)
+         val api = retrofitClient.authApi
+         val token = uiState.value.token
+         return withContext(Dispatchers.IO) {
+             try {
+                 val response = api.validateToken(JwtToken(token))
+                 println("isValid: $response")
+                 val isValid = response == "true"
+                 withContext(Dispatchers.Main) {
+                     _uiState.update { currentState ->
+                         currentState.copy(isTokenValid = isValid)
+                     }
+                 }
+                 isValid
+             } catch (e: Exception) {
+                 println("Error: ${e.message}")
+                 withContext(Dispatchers.Main) {
+                     _uiState.update { currentState ->
+                         currentState.copy(isTokenValid = false)
+                     }
+                 }
+                 false
+             }
+         }
+    }
+
+    suspend fun getExpensesFromApi(context: Context): List<Expense> {
         val retrofitClient = RetrofitClient(context)
-        val api = retrofitClient.authApi
-        val token = uiState.value.token
-        viewModelScope.launch(Dispatchers.IO) {
+        val api = retrofitClient.expenseApi
+        return withContext(Dispatchers.IO) {
             try {
-                val response = api.validateToken(JwtToken(token))
-                println("isValid: $response")
+                val response = api.getUserExpenses()
+                println(response)
                 withContext(Dispatchers.Main) {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            isTokenValid = response.equals("true")
+                            expenses = response
                         )
                     }
                 }
-            } catch (e: Exception) {
+                response
+            } catch(e: Exception) {
                 println(e.message)
-                withContext(Dispatchers.Main) {
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            isTokenValid = false
-                        )
-                    }
-                }
+                emptyList()
             }
         }
     }

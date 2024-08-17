@@ -6,7 +6,7 @@ data class ExpenseTrackerUiState(
     val username: String = "",
     val password: String = "",
     val token: String = "",
-    val isTokenValid: Boolean = true,
+    val isTokenValid: Boolean = false,
     val expenses: List<Expense> = emptyList(),
     val totalExpense: Double = 0.0
 )
