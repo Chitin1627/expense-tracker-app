@@ -1,6 +1,7 @@
 package com.example.expensetrackerapp.components.appbar
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Home
@@ -26,6 +27,13 @@ sealed class BottomNavItem(
             Icons.Outlined.CheckCircle,
             "statistics"
         )
+
+    object AddExpense:
+            BottomNavItem(
+                "Add Expense",
+                Icons.Outlined.AddCircle,
+                "addExpense"
+            )
 
 
     object Profile :

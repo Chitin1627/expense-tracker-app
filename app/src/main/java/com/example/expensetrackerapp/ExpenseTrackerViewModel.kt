@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.example.expensetrackerapp.api.RetrofitClient
 import com.example.expensetrackerapp.data.ExpenseTrackerUiState
+import com.example.expensetrackerapp.data.getUsername
 import com.example.expensetrackerapp.data.saveToken
 import com.example.expensetrackerapp.model.Category
 import com.example.expensetrackerapp.model.Expense
+import com.example.expensetrackerapp.model.ExpenseRequest
 import com.example.expensetrackerapp.model.JwtToken
 import com.example.expensetrackerapp.model.LoginRequest
 import kotlinx.coroutines.CoroutineScope
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Date
 
 class ExpenseTrackerViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(ExpenseTrackerUiState())
@@ -68,11 +71,15 @@ class ExpenseTrackerViewModel : ViewModel() {
         return uiState.value.categories
     }
 
+    fun getCategoriesNameMap(): HashMap<String, String> {
+        return uiState.value.categoryNameMap
+    }
+
     fun isTokenValid(): Boolean {
         return uiState.value.isTokenValid
     }
 
-    fun performLogin(context: Context, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+    suspend fun performLogin(context: Context, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
         val retrofitClient = RetrofitClient(context)
         val api = retrofitClient.authApi
         val username = uiState.value.username
@@ -148,13 +155,16 @@ class ExpenseTrackerViewModel : ViewModel() {
             try {
                 val response = api.getCategories()
                 val categoryMap = HashMap<String, String>()
+                val categoryNameMap = HashMap<String, String>()
                 response.forEach { category ->
                     categoryMap.put(category._id, category.name)
+                    categoryNameMap.put(category.name, category._id)
                 }
                 withContext(Dispatchers.Main) {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            categories = categoryMap
+                            categories = categoryMap,
+                            categoryNameMap = categoryNameMap
                         )
                     }
                 }
@@ -162,6 +172,32 @@ class ExpenseTrackerViewModel : ViewModel() {
             } catch(e: Exception) {
                 println(e.message)
                 emptyList()
+            }
+        }
+    }
+
+    suspend fun createExpense(context: Context, amount: Double, category: String, description: String, date: String) {
+        val retrofitClient = RetrofitClient(context)
+        val api = retrofitClient.expenseApi
+        withContext(Dispatchers.Main) {
+            try {
+                val categories = uiState.value.categoryNameMap
+                val category_id = categories[category] ?: ""
+                val expense = ExpenseRequest(
+                    username = getUsername(context) ?: "",
+                    amount = amount,
+                    category_id = category_id,
+                    description = description,
+                    date = date
+                )
+                val response = api.createExpense(expense)
+                if (response.isSuccessful) {
+                    println("Expense Created")
+                } else {
+                    println("Error: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                println("Exception: ${e.message}")
             }
         }
     }

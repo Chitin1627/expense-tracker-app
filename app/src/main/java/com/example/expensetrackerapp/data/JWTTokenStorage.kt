@@ -33,3 +33,19 @@ fun removeToken(context: Context) {
     sharedPref.edit().remove("jwt_token").apply()
 }
 
+fun saveUsername(context: Context, username: String) {
+    val sharedPref = getEncryptedSharedPreferences(context)
+    sharedPref.edit().putString("username", username).apply()
+}
+
+fun getUsername(context: Context): String? {
+    val sharedPref = getEncryptedSharedPreferences(context)
+    return sharedPref.getString("username", null)
+}
+
+fun removeUsername(context: Context) {
+    val sharedPref = getEncryptedSharedPreferences(context)
+    sharedPref.edit().remove("username").apply()
+}
+
+

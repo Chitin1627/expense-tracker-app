@@ -59,7 +59,7 @@ fun LoginScreen(
             )
         }
 
-        Spacer(modifier = Modifier.padding(8.dp))
+        Spacer(modifier = Modifier.padding(4.dp))
 
         Text(
             text = "Login",
@@ -67,6 +67,7 @@ fun LoginScreen(
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold
         )
+        Spacer(modifier = Modifier.padding(4.dp))
 
         OutlinedTextField(
             value = username,
@@ -112,7 +113,11 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.padding(4.dp))
 
-        Button(onClick = { loginOnClick(username, password) }
+        Button(onClick = {
+            loginOnClick(username, password)
+            username = ""
+            password = ""
+        }
         ) {
             Text(text = "Login")
         }

@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 val items = listOf(
     BottomNavItem.Statistics,
     BottomNavItem.Home,
+    BottomNavItem.AddExpense,
     BottomNavItem.Profile
 )
 @Composable

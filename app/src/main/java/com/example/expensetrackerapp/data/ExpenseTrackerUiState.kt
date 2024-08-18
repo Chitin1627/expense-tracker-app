@@ -10,5 +10,6 @@ data class ExpenseTrackerUiState(
     val isTokenValid: Boolean = false,
     val expenses: List<Expense> = emptyList(),
     val categories: HashMap<String, String> = HashMap<String, String>(),
+    val categoryNameMap: HashMap<String, String> = HashMap<String, String>(),
     val totalExpense: Double = 0.0
 )
