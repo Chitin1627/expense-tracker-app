@@ -54,6 +54,10 @@ class RetrofitClient(context: Context) {
         retrofit.create(ExpenseApi::class.java)
     }
 
+    val categoryApi: CategoryApi by lazy {
+        retrofit.create(CategoryApi::class.java)
+    }
+
     fun setUsernamePassword(user: String, pass: String) {
         username = user
         password = pass

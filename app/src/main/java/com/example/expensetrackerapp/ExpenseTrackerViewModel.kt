@@ -2,10 +2,10 @@ package com.example.expensetrackerapp
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.expensetrackerapp.api.RetrofitClient
 import com.example.expensetrackerapp.data.ExpenseTrackerUiState
 import com.example.expensetrackerapp.data.saveToken
+import com.example.expensetrackerapp.model.Category
 import com.example.expensetrackerapp.model.Expense
 import com.example.expensetrackerapp.model.JwtToken
 import com.example.expensetrackerapp.model.LoginRequest
@@ -62,6 +62,10 @@ class ExpenseTrackerViewModel : ViewModel() {
                 token = token
             )
         }
+    }
+
+    fun getCategories(): HashMap<String, String> {
+        return uiState.value.categories
     }
 
     fun isTokenValid(): Boolean {
@@ -126,6 +130,31 @@ class ExpenseTrackerViewModel : ViewModel() {
                     _uiState.update { currentState ->
                         currentState.copy(
                             expenses = response
+                        )
+                    }
+                }
+                response
+            } catch(e: Exception) {
+                println(e.message)
+                emptyList()
+            }
+        }
+    }
+
+    suspend fun getCategoriesFromApi(context: Context): List<Category> {
+        val retrofitClient = RetrofitClient(context)
+        val api = retrofitClient.categoryApi
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = api.getCategories()
+                val categoryMap = HashMap<String, String>()
+                response.forEach { category ->
+                    categoryMap.put(category._id, category.name)
+                }
+                withContext(Dispatchers.Main) {
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            categories = categoryMap
                         )
                     }
                 }

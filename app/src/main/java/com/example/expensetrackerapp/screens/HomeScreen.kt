@@ -22,7 +22,8 @@ import com.example.expensetrackerapp.model.Expense
 
 @Composable
 fun HomeScreen(
-    expenses: List<Expense>
+    expenses: List<Expense>,
+    categories: HashMap<String, String>
 ) {
     LazyColumn(
         modifier = Modifier
@@ -31,13 +32,19 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(expenses) { expense ->
-            ExpenseCard(expense)
+            val category = categories[expense.category_id]
+            if (category != null) {
+                ExpenseCard(expense, category)
+            }
         }
     }
 }
 
 @Composable
-fun ExpenseCard(expense: Expense) {
+fun ExpenseCard(
+    expense: Expense,
+    category: String
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -58,6 +65,15 @@ fun ExpenseCard(expense: Expense) {
                 textAlign = TextAlign.Start
             )
             Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Category: $category",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+
             Text(
                 text = "Date: ${expense.date}",
                 style = MaterialTheme.typography.bodySmall,

@@ -57,12 +57,16 @@ fun ExpenseTrackerApp(
                 var isLoading by remember { mutableStateOf(true) }
                 LaunchedEffect(Unit) {
                     appViewModel.getExpensesFromApi(context)
+                    appViewModel.getCategoriesFromApi(context)
                     isLoading = false
                 }
                 if (isLoading) {
                     LoadingScreen()
                 } else {
-                    HomeScreen(expenses = appViewModel.getExpenses())
+                    HomeScreen(
+                        expenses = appViewModel.getExpenses(),
+                        categories = appViewModel.getCategories()
+                    )
                 }
             }
             composable(BottomNavItem.Statistics.route) { Greeting(name = "STATS")}
@@ -74,7 +78,7 @@ fun ExpenseTrackerApp(
                         appViewModel.setUsernamePassword(username, password)
                         appViewModel.performLogin(
                             context = context,
-                            onSuccess = { token ->
+                            onSuccess = {
                                 navController.navigate(BottomNavItem.Home.route) {
                                     popUpTo(navController.graph.startDestinationId) {
                                         saveState = true
