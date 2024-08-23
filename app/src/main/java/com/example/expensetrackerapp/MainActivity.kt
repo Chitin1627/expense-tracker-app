@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 import com.example.expensetrackerapp.api.RetrofitClient
 import com.example.expensetrackerapp.model.JwtToken
+import com.example.expensetrackerapp.screens.PieChartScreen
 import com.example.expensetrackerapp.ui.theme.ExpenseTrackerAppTheme
 
 class MainActivity : ComponentActivity() {

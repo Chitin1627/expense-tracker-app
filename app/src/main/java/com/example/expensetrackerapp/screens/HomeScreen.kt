@@ -18,26 +18,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.expensetrackerapp.model.CategoryExpense
 import com.example.expensetrackerapp.model.Expense
+import kotlin.math.exp
 
 @Composable
 fun HomeScreen(
     expenses: List<Expense>,
-    categories: HashMap<String, String>
+    categories: HashMap<String, String>,
+    expenseByCategory: List<CategoryExpense>
 ) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(expenses) { expense ->
-            val category = categories[expense.category_id]
-            if (category != null) {
-                ExpenseCard(expense, category)
-            }
-        }
-    }
+//    LazyColumn(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .padding(16.dp),
+//        verticalArrangement = Arrangement.spacedBy(8.dp)
+//    ) {
+//        items(expenses) { expense ->
+//            val category = categories[expense.category_id]
+//            if (category != null) {
+//                ExpenseCard(expense, category)
+//            }
+//        }
+//    }
+    PieChartScreen(pieChartData = expenseByCategory)
 }
 
 @Composable

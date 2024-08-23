@@ -72,21 +72,21 @@ fun ExpenseTrackerApp(
                 if (isLoading) {
                     LoadingScreen()
                 } else {
+                    appViewModel.calculateExpenseByCategory()
+                    appViewModel.setListOfExpenseByCategory()
                     HomeScreen(
                         expenses = appViewModel.getExpenses(),
-                        categories = appViewModel.getCategories()
+                        categories = appViewModel.getCategories(),
+                        expenseByCategory = appViewModel.getListOfExpenseByCategory()
                     )
                 }
             }
             composable(BottomNavItem.AddExpense.route) {
                 CreateExpensePopup(
                     onSave = { amount, category, description, date ->
-                        // Launch a coroutine in the appropriate scope to call the suspend function
                         CoroutineScope(Dispatchers.IO).launch {
                             try {
                                 appViewModel.createExpense(context, amount, category, description, date)
-
-                                // Once the expense is created, navigate to the Home screen
                                 withContext(Dispatchers.Main) {
                                     navController.navigate(BottomNavItem.Home.route) {
                                         popUpTo(navController.graph.startDestinationId) {

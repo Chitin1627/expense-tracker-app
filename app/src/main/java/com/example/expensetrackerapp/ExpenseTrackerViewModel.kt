@@ -7,6 +7,7 @@ import com.example.expensetrackerapp.data.ExpenseTrackerUiState
 import com.example.expensetrackerapp.data.getUsername
 import com.example.expensetrackerapp.data.saveToken
 import com.example.expensetrackerapp.model.Category
+import com.example.expensetrackerapp.model.CategoryExpense
 import com.example.expensetrackerapp.model.Expense
 import com.example.expensetrackerapp.model.ExpenseRequest
 import com.example.expensetrackerapp.model.JwtToken
@@ -200,5 +201,55 @@ class ExpenseTrackerViewModel : ViewModel() {
                 println("Exception: ${e.message}")
             }
         }
+    }
+
+    fun calculateExpenseByCategory() : HashMap<String, Double>{
+        val expenseByCategory = HashMap<String, Double>()
+        val categories = uiState.value.categories
+        val expenses = uiState.value.expenses
+        categories.forEach { (_, name) ->
+            expenseByCategory[name] = 0.0
+        }
+        expenses.forEach { expense ->
+            val category = categories[expense.category_id]
+            if(expenseByCategory.containsKey(category)) {
+                if (category != null) {
+                    expenseByCategory[category] = (expenseByCategory[category]?: 0.0) + expense.amount
+                }
+            }
+            else {
+                if (category != null) {
+                    expenseByCategory[category] = expense.amount
+                }
+            }
+        }
+        _uiState.update { currentState->
+            currentState.copy(
+                expenseByCategory = expenseByCategory
+            )
+
+        }
+        return expenseByCategory
+    }
+
+    fun getExpenseByCategory(): HashMap<String, Double> {
+        return uiState.value.expenseByCategory
+    }
+
+    fun setListOfExpenseByCategory() {
+        val expenseByCategory = uiState.value.expenseByCategory
+        val listOfExpenseByCategory = ArrayList<CategoryExpense>()
+        expenseByCategory.forEach { (category, expense) ->
+            listOfExpenseByCategory.add(CategoryExpense(category, expense.toFloat()))
+        }
+        _uiState.update { currentState ->
+            currentState.copy(
+                listOfExpenseByCategory = listOfExpenseByCategory
+            )
+        }
+    }
+
+    fun getListOfExpenseByCategory() : List<CategoryExpense> {
+        return uiState.value.listOfExpenseByCategory
     }
 }
