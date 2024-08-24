@@ -6,6 +6,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.create
 
 
 class RetrofitClient(context: Context) {
@@ -56,6 +57,10 @@ class RetrofitClient(context: Context) {
 
     val categoryApi: CategoryApi by lazy {
         retrofit.create(CategoryApi::class.java)
+    }
+
+    val userSpendingApi: UserSpendingApi by lazy {
+        retrofit.create(UserSpendingApi::class.java)
     }
 
     fun setUsernamePassword(user: String, pass: String) {

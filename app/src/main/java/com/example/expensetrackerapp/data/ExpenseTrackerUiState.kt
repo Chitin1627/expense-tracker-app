@@ -8,6 +8,8 @@ data class ExpenseTrackerUiState(
     val username: String = "",
     val password: String = "",
     val token: String = "",
+    val monthlyLimit: Double = -1.0,
+    val currentMonthExpense: Double = 0.0,
     val isTokenValid: Boolean = false,
     val expenses: List<Expense> = emptyList(),
     val categories: HashMap<String, String> = HashMap<String, String>(),

@@ -34,6 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import com.example.expensetrackerapp.ui.theme.Apple
+import com.example.expensetrackerapp.ui.theme.Basil
 import com.example.expensetrackerapp.ui.theme.DarkAmber
 import com.example.expensetrackerapp.ui.theme.DarkCrimson
 import com.example.expensetrackerapp.ui.theme.DarkCyan
@@ -42,6 +44,10 @@ import com.example.expensetrackerapp.ui.theme.DarkDeepGreen
 import com.example.expensetrackerapp.ui.theme.DarkIndigo
 import com.example.expensetrackerapp.ui.theme.DarkLime
 import com.example.expensetrackerapp.ui.theme.DarkMagenta
+import com.example.expensetrackerapp.ui.theme.Forest
+import com.example.expensetrackerapp.ui.theme.Khaki
+import com.example.expensetrackerapp.ui.theme.Mint
+import com.example.expensetrackerapp.ui.theme.Pastel
 
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
@@ -103,11 +109,12 @@ fun updatePieChartWithData(
     }
     val ds = PieDataSet(entries, "")
     ds.colors = arrayListOf(
-        DarkMagenta.toArgb(),
-        DarkAmber.toArgb(),
-        DarkIndigo.toArgb(),
-        DarkLime.toArgb(),
-        DarkDeepBlue.toArgb(),
+        Khaki.toArgb(),
+        Pastel.toArgb(),
+        Mint.toArgb(),
+        Basil.toArgb(),
+        Apple.toArgb(),
+        Forest.toArgb(),
         DarkDeepGreen.toArgb(),
         DarkCyan.toArgb(),
         DarkCrimson.toArgb(),

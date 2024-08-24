@@ -14,6 +14,7 @@ import com.example.expensetrackerapp.model.Expense
 import com.example.expensetrackerapp.model.ExpenseRequest
 import com.example.expensetrackerapp.model.JwtToken
 import com.example.expensetrackerapp.model.LoginRequest
+import com.example.expensetrackerapp.model.UserSpendingRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -208,6 +209,42 @@ class ExpenseTrackerViewModel : ViewModel() {
         }
     }
 
+    suspend fun getSpendingLimitFromApi(context: Context) {
+        val retrofitClient = RetrofitClient(context)
+        val api = retrofitClient.userSpendingApi
+        withContext(Dispatchers.Main) {
+            val response = api.getUserSpending()
+            if(response.username!=null) {
+                _uiState.update { currentState->
+                    currentState.copy(
+                        monthlyLimit = response.monthlyLimit
+                    )
+                }
+            }
+        }
+    }
+
+    suspend fun setSpendingLimitFromApi(newLimit: Double, context: Context) {
+        val retrofitClient = RetrofitClient(context)
+        val api = retrofitClient.userSpendingApi
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = api.setMonthlyLimit(UserSpendingRequest(newLimit))
+                println("isValid: $response")
+                if(response.monthlyLimit==newLimit) {
+                    withContext(Dispatchers.Main) {
+                        _uiState.update { currentState ->
+                            currentState.copy(monthlyLimit = newLimit)
+                        }
+                    }
+                }
+            } catch (_: Exception) {
+            }
+        }
+    }
+    fun getSpendingLimit(): Double {
+        return uiState.value.monthlyLimit
+    }
     @RequiresApi(Build.VERSION_CODES.O)
     fun calculateExpenseByCategory() : HashMap<String, Double>{
         val expenseByCategory = HashMap<String, Double>()
@@ -262,5 +299,28 @@ class ExpenseTrackerViewModel : ViewModel() {
 
     fun getListOfExpenseByCategory() : List<CategoryExpense> {
         return uiState.value.listOfExpenseByCategory
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun calculateCurrentMonthExpense() {
+        val expenses = uiState.value.expenses
+        val currMonth = LocalDate.now().month
+        val currYear = LocalDate.now().year
+        var currentMonthExpense = 0.0
+        expenses.forEach { expense ->
+            val date = LocalDate.parse(expense.date, DateTimeFormatter.ISO_DATE_TIME)
+            if(date.month==currMonth && date.year==currYear) {
+                currentMonthExpense+=expense.amount
+            }
+        }
+        _uiState.update { currentState ->
+            currentState.copy(
+                currentMonthExpense = currentMonthExpense
+            )
+        }
+    }
+
+    fun getCurrentMonthExpense(): Double {
+        return uiState.value.currentMonthExpense
     }
 }

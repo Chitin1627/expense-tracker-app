@@ -81,6 +81,7 @@ fun ExpenseTrackerApp(
                 LaunchedEffect(Unit) {
                     appViewModel.getExpensesFromApi(context)
                     appViewModel.getCategoriesFromApi(context)
+                    appViewModel.getSpendingLimitFromApi(context)
                     isLoading = false
                 }
                 if (isLoading) {
@@ -88,10 +89,18 @@ fun ExpenseTrackerApp(
                 } else {
                     appViewModel.calculateExpenseByCategory()
                     appViewModel.setListOfExpenseByCategory()
+                    appViewModel.calculateCurrentMonthExpense()
                     HomeScreen(
                         expenses = appViewModel.getExpenses(),
                         categories = appViewModel.getCategories(),
-                        expenseByCategory = appViewModel.getListOfExpenseByCategory()
+                        expenseByCategory = appViewModel.getListOfExpenseByCategory(),
+                        monthlyLimit = appViewModel.getSpendingLimit(),
+                        currentMonthExpense = appViewModel.getCurrentMonthExpense(),
+                        onSetLimit = { limit ->
+                            CoroutineScope(Dispatchers.IO).launch {
+                                appViewModel.setSpendingLimitFromApi(limit, context)
+                            }
+                        }
                     )
                 }
             }

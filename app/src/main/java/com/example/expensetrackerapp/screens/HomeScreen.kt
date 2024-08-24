@@ -1,6 +1,7 @@
 package com.example.expensetrackerapp.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,12 +24,20 @@ import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.expensetrackerapp.components.MonthlyLimitDialog
+import com.example.expensetrackerapp.components.SpendingProgressBar
 import com.example.expensetrackerapp.data.getUsername
 import com.example.expensetrackerapp.model.CategoryExpense
 import com.example.expensetrackerapp.model.Expense
@@ -38,7 +47,10 @@ import kotlin.math.exp
 fun HomeScreen(
     expenses: List<Expense>,
     categories: HashMap<String, String>,
-    expenseByCategory: List<CategoryExpense>
+    expenseByCategory: List<CategoryExpense>,
+    monthlyLimit: Double,
+    currentMonthExpense: Double,
+    onSetLimit: (Double) -> Unit
 ) {
 //    LazyColumn(
 //        modifier = Modifier
@@ -54,6 +66,13 @@ fun HomeScreen(
 //        }
 //    }
     val context = LocalContext.current
+    var showDialog by rememberSaveable {
+        mutableStateOf(false)
+    }
+    var monthlyExpenseLimit by rememberSaveable {
+        mutableStateOf(monthlyLimit)
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
         Row {
             Text(
@@ -88,7 +107,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .weight(1f)
-                        .padding(end = 4.dp, top = 4.dp, bottom = 4.dp),
+                        .padding(start = 8.dp, end = 4.dp, top = 4.dp, bottom = 8.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     border = BorderStroke(2.dp, Color.Black)
@@ -98,34 +117,45 @@ fun HomeScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .weight(1f),
+                        .weight(1f)
+                        .padding(start = 16.dp, end = 8.dp, bottom = 8.dp),
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Button(
-                        onClick = { /*TODO*/ },
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .weight(1f)
-                            .padding(4.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        border = BorderStroke(2.dp, Color.Black)
+                    Column(
+                        modifier = Modifier.weight(1f)
                     ) {
-                        Text(text = "Button2")
+                        SpendingProgressBar(
+                            totalSpent = currentMonthExpense,
+                            monthlyLimit = monthlyExpenseLimit,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 2.dp, top = 4.dp, bottom = 8.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
                     }
                     Button(
-                        onClick = { /*TODO*/ },
+                        onClick = { showDialog = true },
                         modifier = Modifier
                             .fillMaxSize()
-                            .weight(1f)
-                            .padding(4.dp),
+                            .weight(1f),
                         shape = RoundedCornerShape(16.dp),
                         border = BorderStroke(2.dp, Color.Black)
                     ) {
-                        Text(text = "Button3")
+                        Text(text = "Set Monthly Limit")
                     }
                 }
             }
         }
+    }
+
+    if(showDialog) {
+        MonthlyLimitDialog(
+            onSetLimit = {limit ->
+                onSetLimit(limit)
+                monthlyExpenseLimit = limit
+            },
+            onDismiss = {showDialog = false}
+        )
     }
 }
 
