@@ -1,5 +1,7 @@
 package com.example.expensetrackerapp
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -11,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.capitalize
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -19,7 +22,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.expensetrackerapp.components.CreateExpensePopup
 import com.example.expensetrackerapp.components.appbar.BottomNavBar
-import com.example.expensetrackerapp.components.appbar.BottomNavItem
+import com.example.expensetrackerapp.components.appbar.AppScreen
+import com.example.expensetrackerapp.components.appbar.MyTopAppBar
 import com.example.expensetrackerapp.data.getToken
 import com.example.expensetrackerapp.data.removeToken
 import com.example.expensetrackerapp.data.removeUsername
@@ -32,8 +36,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ExpenseTrackerApp(
     appViewModel: ExpenseTrackerViewModel = viewModel(),
@@ -45,7 +51,7 @@ fun ExpenseTrackerApp(
     println("CurrentRoute: $currentRoute")
     Scaffold(
         bottomBar = {
-            if (currentRoute !in listOf(BottomNavItem.Login.route, BottomNavItem.Loading.route, BottomNavItem.Validating.route, null)) {
+            if (currentRoute !in listOf(AppScreen.Login.route, AppScreen.Loading.route, AppScreen.Validating.route, null)) {
                 BottomNavBar(
                     navigateTo = { route ->
                         navController.navigate(route) {
@@ -59,10 +65,18 @@ fun ExpenseTrackerApp(
                     currentRoute = currentRoute
                 )
             }
+        },
+        topBar = {
+            if (currentRoute !in listOf(AppScreen.Login.route, AppScreen.Loading.route, AppScreen.Validating.route, null)) {
+                if (currentRoute != null) {
+                    MyTopAppBar(
+                        currentScreen = currentRoute.replaceFirstChar(Char::titlecase))
+                }
+            }
         }
     ) { innerPadding ->
-        NavHost(navController = navController, startDestination = BottomNavItem.Validating.route, Modifier.padding(innerPadding)) {
-            composable(BottomNavItem.Home.route) {
+        NavHost(navController = navController, startDestination = AppScreen.Validating.route, Modifier.padding(innerPadding)) {
+            composable(AppScreen.Home.route) {
                 var isLoading by remember { mutableStateOf(true) }
                 LaunchedEffect(Unit) {
                     appViewModel.getExpensesFromApi(context)
@@ -81,14 +95,14 @@ fun ExpenseTrackerApp(
                     )
                 }
             }
-            composable(BottomNavItem.AddExpense.route) {
+            composable(AppScreen.AddExpense.route) {
                 CreateExpensePopup(
                     onSave = { amount, category, description, date ->
                         CoroutineScope(Dispatchers.IO).launch {
                             try {
                                 appViewModel.createExpense(context, amount, category, description, date)
                                 withContext(Dispatchers.Main) {
-                                    navController.navigate(BottomNavItem.Home.route) {
+                                    navController.navigate(AppScreen.Home.route) {
                                         popUpTo(navController.graph.startDestinationId) {
                                             saveState = true
                                         }
@@ -102,7 +116,7 @@ fun ExpenseTrackerApp(
                         }
                     },
                     onDismiss = {
-                        navController.navigate(BottomNavItem.Home.route) {
+                        navController.navigate(AppScreen.Home.route) {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }
@@ -112,13 +126,13 @@ fun ExpenseTrackerApp(
                     }
                 )
             }
-            composable(BottomNavItem.Statistics.route) { Greeting(name = "STATS")}
-            composable(BottomNavItem.Profile.route) {
+            composable(AppScreen.Statistics.route) { Greeting(name = "STATS")}
+            composable(AppScreen.Profile.route) {
                 ProfileScreen(
                     logoutOnClick = {
                         removeToken(context = context)
                         removeUsername(context = context)
-                        navController.navigate(BottomNavItem.Validating.route) {
+                        navController.navigate(AppScreen.Validating.route) {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }
@@ -128,7 +142,7 @@ fun ExpenseTrackerApp(
                     }
                 )
             }
-            composable(BottomNavItem.Validating.route) {
+            composable(AppScreen.Validating.route) {
                 MainScreen(
                     context = context,
                     loginOnClick = { username, password ->
@@ -138,7 +152,7 @@ fun ExpenseTrackerApp(
                                 context = context,
                                 onSuccess = {
                                     saveUsername(context, username)
-                                    navController.navigate(BottomNavItem.Home.route) {
+                                    navController.navigate(AppScreen.Home.route) {
                                         popUpTo(navController.graph.startDestinationId) {
                                             saveState = true
                                         }
@@ -161,7 +175,7 @@ fun ExpenseTrackerApp(
                         appViewModel.isTokenValid()
                     },
                     goToHome = {
-                        navController.navigate(BottomNavItem.Home.route) {
+                        navController.navigate(AppScreen.Home.route) {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }

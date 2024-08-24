@@ -5,10 +5,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 val items = listOf(
-    BottomNavItem.Statistics,
-    BottomNavItem.Home,
-    BottomNavItem.AddExpense,
-    BottomNavItem.Profile
+    AppScreen.Statistics,
+    AppScreen.Home,
+    AppScreen.AddExpense,
+    AppScreen.Profile
 )
 @Composable
 fun BottomNavBar(

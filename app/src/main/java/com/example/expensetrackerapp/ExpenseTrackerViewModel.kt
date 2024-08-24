@@ -1,6 +1,8 @@
 package com.example.expensetrackerapp
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import com.example.expensetrackerapp.api.RetrofitClient
 import com.example.expensetrackerapp.data.ExpenseTrackerUiState
@@ -21,6 +23,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Date
 
 class ExpenseTrackerViewModel : ViewModel() {
@@ -203,23 +208,29 @@ class ExpenseTrackerViewModel : ViewModel() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun calculateExpenseByCategory() : HashMap<String, Double>{
         val expenseByCategory = HashMap<String, Double>()
         val categories = uiState.value.categories
         val expenses = uiState.value.expenses
+        val currMonth = LocalDate.now().month
+        val currYear = LocalDate.now().year
         categories.forEach { (_, name) ->
             expenseByCategory[name] = 0.0
         }
         expenses.forEach { expense ->
-            val category = categories[expense.category_id]
-            if(expenseByCategory.containsKey(category)) {
-                if (category != null) {
-                    expenseByCategory[category] = (expenseByCategory[category]?: 0.0) + expense.amount
+            val date = LocalDate.parse(expense.date, DateTimeFormatter.ISO_DATE_TIME)
+            if(date.month==currMonth && date.year==currYear) {
+                val category = categories[expense.category_id]
+                if(expenseByCategory.containsKey(category)) {
+                    if (category != null) {
+                        expenseByCategory[category] = (expenseByCategory[category]?: 0.0) + expense.amount
+                    }
                 }
-            }
-            else {
-                if (category != null) {
-                    expenseByCategory[category] = expense.amount
+                else {
+                    if (category != null) {
+                        expenseByCategory[category] = expense.amount
+                    }
                 }
             }
         }

@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Color
 
 @Composable
 fun RowScope.AddItem(
-    screen: BottomNavItem,
+    screen: AppScreen,
     currentRoute: String?,
     onClick: ()->Unit
 ) {

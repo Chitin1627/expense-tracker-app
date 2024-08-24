@@ -9,55 +9,55 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.ui.graphics.vector.ImageVector
 
-sealed class BottomNavItem(
+sealed class AppScreen(
     var title: String,
     var icon: ImageVector,
     val route: String
 ) {
     object Home :
-        BottomNavItem(
+        AppScreen(
             "Home",
             Icons.Outlined.Home,
             "home"
         )
 
     object Statistics :
-        BottomNavItem(
+        AppScreen(
             "Statistics",
             Icons.Outlined.CheckCircle,
             "statistics"
         )
 
     object AddExpense:
-            BottomNavItem(
+            AppScreen(
                 "Add Expense",
                 Icons.Outlined.AddCircle,
-                "addExpense"
+                "add Expense"
             )
 
 
     object Profile :
-        BottomNavItem(
+        AppScreen(
             "Profile",
             Icons.Outlined.Person,
             "profile"
         )
 
     object Login :
-        BottomNavItem(
+        AppScreen(
             "Login",
             Icons.Outlined.Check,
             "login"
         )
     object Loading :
-        BottomNavItem(
+        AppScreen(
             "Loading",
             Icons.Outlined.Refresh,
             "loading"
         )
 
     object Validating:
-            BottomNavItem(
+            AppScreen(
                 "Validating",
                 Icons.Outlined.Check,
                 "validating"
