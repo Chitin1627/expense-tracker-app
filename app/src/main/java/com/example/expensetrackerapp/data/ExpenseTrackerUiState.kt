@@ -12,6 +12,7 @@ data class ExpenseTrackerUiState(
     val currentMonthExpense: Double = 0.0,
     val isTokenValid: Boolean = false,
     val expenses: List<Expense> = emptyList(),
+    val expensesByDate: List<Expense> = emptyList(),
     val categories: HashMap<String, String> = HashMap<String, String>(),
     val categoryNameMap: HashMap<String, String> = HashMap<String, String>(),
     val expenseByCategory: HashMap<String, Double> = HashMap<String, Double>(),

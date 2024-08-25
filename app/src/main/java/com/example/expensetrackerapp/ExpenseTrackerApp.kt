@@ -13,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.capitalize
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -24,10 +23,13 @@ import com.example.expensetrackerapp.components.CreateExpensePopup
 import com.example.expensetrackerapp.components.appbar.BottomNavBar
 import com.example.expensetrackerapp.components.appbar.AppScreen
 import com.example.expensetrackerapp.components.appbar.MyTopAppBar
+import com.example.expensetrackerapp.components.defaultEnterTransition
+import com.example.expensetrackerapp.components.defaultExitTransition
 import com.example.expensetrackerapp.data.getToken
 import com.example.expensetrackerapp.data.removeToken
 import com.example.expensetrackerapp.data.removeUsername
 import com.example.expensetrackerapp.data.saveUsername
+import com.example.expensetrackerapp.screens.ExpenseByDateScreen
 import com.example.expensetrackerapp.screens.HomeScreen
 import com.example.expensetrackerapp.screens.LoadingScreen
 import com.example.expensetrackerapp.screens.MainScreen
@@ -36,8 +38,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Locale
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -76,7 +76,13 @@ fun ExpenseTrackerApp(
         }
     ) { innerPadding ->
         NavHost(navController = navController, startDestination = AppScreen.Validating.route, Modifier.padding(innerPadding)) {
-            composable(AppScreen.Home.route) {
+            composable(
+                AppScreen.Home.route,
+                enterTransition = defaultEnterTransition(),
+                exitTransition = defaultExitTransition(),
+                popEnterTransition = defaultEnterTransition(),
+                popExitTransition = defaultExitTransition()
+            ) {
                 var isLoading by remember { mutableStateOf(true) }
                 LaunchedEffect(Unit) {
                     appViewModel.getExpensesFromApi(context)
@@ -91,8 +97,6 @@ fun ExpenseTrackerApp(
                     appViewModel.setListOfExpenseByCategory()
                     appViewModel.calculateCurrentMonthExpense()
                     HomeScreen(
-                        expenses = appViewModel.getExpenses(),
-                        categories = appViewModel.getCategories(),
                         expenseByCategory = appViewModel.getListOfExpenseByCategory(),
                         monthlyLimit = appViewModel.getSpendingLimit(),
                         currentMonthExpense = appViewModel.getCurrentMonthExpense(),
@@ -100,11 +104,27 @@ fun ExpenseTrackerApp(
                             CoroutineScope(Dispatchers.IO).launch {
                                 appViewModel.setSpendingLimitFromApi(limit, context)
                             }
+                        },
+                        onDateSelected = {date ->
+                            appViewModel.setExpensesByDate(date)
+                            navController.navigate(AppScreen.ExpenseByDate.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         }
                     )
                 }
             }
-            composable(AppScreen.AddExpense.route) {
+            composable(
+                AppScreen.AddExpense.route,
+                enterTransition = defaultEnterTransition(),
+                exitTransition = defaultExitTransition(),
+                popEnterTransition = defaultEnterTransition(),
+                popExitTransition = defaultExitTransition()
+            ) {
                 CreateExpensePopup(
                     onSave = { amount, category, description, date ->
                         CoroutineScope(Dispatchers.IO).launch {
@@ -135,7 +155,13 @@ fun ExpenseTrackerApp(
                     }
                 )
             }
-            composable(AppScreen.Statistics.route) { Greeting(name = "STATS")}
+            composable(
+                AppScreen.Statistics.route,
+                enterTransition = defaultEnterTransition(),
+                exitTransition = defaultExitTransition(),
+                popEnterTransition = defaultEnterTransition(),
+                popExitTransition = defaultExitTransition()
+            ) { Greeting(name = "STATS")}
             composable(AppScreen.Profile.route) {
                 ProfileScreen(
                     logoutOnClick = {
@@ -151,7 +177,13 @@ fun ExpenseTrackerApp(
                     }
                 )
             }
-            composable(AppScreen.Validating.route) {
+            composable(
+                AppScreen.Validating.route,
+                enterTransition = defaultEnterTransition(),
+                exitTransition = defaultExitTransition(),
+                popEnterTransition = defaultEnterTransition(),
+                popExitTransition = defaultExitTransition()
+            ) {
                 MainScreen(
                     context = context,
                     loginOnClick = { username, password ->
@@ -192,6 +224,19 @@ fun ExpenseTrackerApp(
                             restoreState = true
                         }
                     }
+                )
+            }
+
+            composable(
+                AppScreen.ExpenseByDate.route,
+                enterTransition = defaultEnterTransition(),
+                exitTransition = defaultExitTransition(),
+                popEnterTransition = defaultEnterTransition(),
+                popExitTransition = defaultExitTransition()
+            ) {
+                ExpenseByDateScreen(
+                    expenses = appViewModel.getExpensesByDate(),
+                    categories = appViewModel.getCategories()
                 )
             }
         }

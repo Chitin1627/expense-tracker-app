@@ -63,4 +63,10 @@ sealed class AppScreen(
                 "validating"
             )
 
+    object ExpenseByDate:
+            AppScreen(
+                "Expense By Date",
+                Icons.Outlined.Check,
+                "Expense By Date"
+            )
 }

@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.expensetrackerapp.components.DateSelectorButton
 import com.example.expensetrackerapp.components.MonthlyLimitDialog
 import com.example.expensetrackerapp.components.SpendingProgressBar
 import com.example.expensetrackerapp.data.getUsername
@@ -45,12 +46,11 @@ import kotlin.math.exp
 
 @Composable
 fun HomeScreen(
-    expenses: List<Expense>,
-    categories: HashMap<String, String>,
     expenseByCategory: List<CategoryExpense>,
     monthlyLimit: Double,
     currentMonthExpense: Double,
-    onSetLimit: (Double) -> Unit
+    onSetLimit: (Double) -> Unit,
+    onDateSelected: (String) -> Unit,
 ) {
 //    LazyColumn(
 //        modifier = Modifier
@@ -102,18 +102,10 @@ fun HomeScreen(
                 .fillMaxSize(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Button(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f)
-                        .padding(start = 8.dp, end = 4.dp, top = 4.dp, bottom = 8.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                    border = BorderStroke(2.dp, Color.Black)
-                ) {
-                    Text(text = "Button1")
-                }
+                DateSelectorButton(
+                    onDateSelected = onDateSelected,
+                    modifier = Modifier.weight(1f)
+                )
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -159,54 +151,3 @@ fun HomeScreen(
     }
 }
 
-@Composable
-fun ExpenseCard(
-    expense: Expense,
-    category: String
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-        border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.primary)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Amount: ${expense.amount}",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Start
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = "Category: $category",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Start
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = "Date: ${expense.date}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Start
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = expense.description,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Start
-            )
-        }
-    }
-}

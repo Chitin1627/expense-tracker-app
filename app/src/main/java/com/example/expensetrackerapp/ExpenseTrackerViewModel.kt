@@ -17,7 +17,6 @@ import com.example.expensetrackerapp.model.LoginRequest
 import com.example.expensetrackerapp.model.UserSpendingRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,9 +24,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Date
 
 class ExpenseTrackerViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(ExpenseTrackerUiState())
@@ -55,7 +52,7 @@ class ExpenseTrackerViewModel : ViewModel() {
     }
 
     fun setTotalExpense(expenses: List<Expense>) {
-        var totalExpense: Double = 0.0
+        var totalExpense = 0.0
         expenses.forEach { expense ->
             totalExpense+=expense.amount
         }
@@ -164,8 +161,8 @@ class ExpenseTrackerViewModel : ViewModel() {
                 val categoryMap = HashMap<String, String>()
                 val categoryNameMap = HashMap<String, String>()
                 response.forEach { category ->
-                    categoryMap.put(category._id, category.name)
-                    categoryNameMap.put(category.name, category._id)
+                    categoryMap[category._id] = category.name
+                    categoryNameMap[category.name] = category._id
                 }
                 withContext(Dispatchers.Main) {
                     _uiState.update { currentState ->
@@ -186,7 +183,7 @@ class ExpenseTrackerViewModel : ViewModel() {
     suspend fun createExpense(context: Context, amount: Double, category: String, description: String, date: String) {
         val retrofitClient = RetrofitClient(context)
         val api = retrofitClient.expenseApi
-        withContext(Dispatchers.Main) {
+        withContext(Dispatchers.IO) {
             try {
                 val categories = uiState.value.categoryNameMap
                 val category_id = categories[category] ?: ""
@@ -212,7 +209,7 @@ class ExpenseTrackerViewModel : ViewModel() {
     suspend fun getSpendingLimitFromApi(context: Context) {
         val retrofitClient = RetrofitClient(context)
         val api = retrofitClient.userSpendingApi
-        withContext(Dispatchers.Main) {
+        withContext(Dispatchers.IO) {
             val response = api.getUserSpending()
             if(response.username!=null) {
                 _uiState.update { currentState->
@@ -232,7 +229,7 @@ class ExpenseTrackerViewModel : ViewModel() {
                 val response = api.setMonthlyLimit(UserSpendingRequest(newLimit))
                 println("isValid: $response")
                 if(response.monthlyLimit==newLimit) {
-                    withContext(Dispatchers.Main) {
+                    withContext(Dispatchers.IO) {
                         _uiState.update { currentState ->
                             currentState.copy(monthlyLimit = newLimit)
                         }
@@ -322,5 +319,30 @@ class ExpenseTrackerViewModel : ViewModel() {
 
     fun getCurrentMonthExpense(): Double {
         return uiState.value.currentMonthExpense
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun setExpensesByDate(date: String) {
+        val selectedDate = LocalDate.parse(date)
+        val expenses = uiState.value.expenses
+        val expensesByDate = ArrayList<Expense>()
+        expenses.forEach {expense->
+            val expenseDate = LocalDate.parse(expense.date, DateTimeFormatter.ISO_DATE_TIME)
+            if(expenseDate.dayOfMonth==selectedDate.dayOfMonth
+                && expenseDate.month==selectedDate.month
+                && expenseDate.year==selectedDate.year
+                ) {
+                expensesByDate.add(expense)
+            }
+        }
+        _uiState.update { currentState ->
+            currentState.copy(
+                expensesByDate = expensesByDate
+            )
+        }
+    }
+
+    fun getExpensesByDate(): List<Expense> {
+        return uiState.value.expensesByDate
     }
 }

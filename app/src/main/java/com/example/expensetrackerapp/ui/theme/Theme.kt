@@ -9,17 +9,17 @@ import androidx.compose.runtime.Composable
 // Define the light color scheme
 private val LightColorScheme = lightColorScheme(
     primary = GreenLight,
-    onPrimary = White,
+    onPrimary = BlackDark,
     background = White,
     onBackground = BlackLight,
     surface = BlackLight,
-    onSurface = BlackLight
+    onSurface = BlackLight,
 )
 
 // Define the dark color scheme
 private val DarkColorScheme = darkColorScheme(
     primary = GreenDark,
-    onPrimary = BlackDark,
+    onPrimary = White,
     background = BlackDark,
     onBackground = White,
     surface = BlackDark,
