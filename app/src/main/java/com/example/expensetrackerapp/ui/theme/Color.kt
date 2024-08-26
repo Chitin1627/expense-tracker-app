@@ -3,14 +3,16 @@ package com.example.expensetrackerapp.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // Light Theme Colors
-val GreenLight = Color(0xFF00C853)  // A bright green
+val GreenLight = Color(0xFF367E18)  // A bright green
 val BlackLight = Color(0xFF000000)  // Black
+val SpringGreen = Color(0xFF00FF7F)
 
 // Dark Theme Colors
 val GreenDark = Color(0xFF1D813E)   // A brighter green for dark mode
-val BlackDark = Color(0xFF000000)   // Dark black for background in dark mode
+val BlackDark = Color(0xFF191A19)   // Dark black for background in dark mode
+val GreenDarker = Color(0xFF023020)
 
-val White = Color(0xFFFFFFFF)       // White
+val White = Color(0xFFECFFDC)       // White
 val Gray = Color(0xFFBDBDBD)        // Light gray for labels
 
 

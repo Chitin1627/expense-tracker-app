@@ -1,9 +1,11 @@
 package com.example.expensetrackerapp
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -18,9 +20,12 @@ import androidx.core.view.WindowCompat
 import com.example.expensetrackerapp.api.RetrofitClient
 import com.example.expensetrackerapp.model.JwtToken
 import com.example.expensetrackerapp.screens.PieChartScreen
+import com.example.expensetrackerapp.ui.theme.BlackDark
 import com.example.expensetrackerapp.ui.theme.ExpenseTrackerAppTheme
+import com.example.expensetrackerapp.ui.theme.White
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -43,9 +48,9 @@ class MainActivity : ComponentActivity() {
             isAppearanceLightStatusBars = !isDarkTheme
         }
         window.statusBarColor = if (isDarkTheme) {
-            Color.Black.toArgb()
+            BlackDark.toArgb()
         } else {
-            Color.White.toArgb()
+            White.toArgb()
         }
     }
 }

@@ -7,13 +7,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -29,6 +32,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -74,18 +78,27 @@ fun HomeScreen(
         mutableStateOf(monthlyLimit)
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Row {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
             Text(
                 text = "Hello ",
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 8.dp)
             )
             Text(
-                text = "${getUsername(context)},",
+                text = "${getUsername(context)?.replaceFirstChar(Char::titlecase)},",
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.headlineLarge,
             )
         }
         Box(modifier = Modifier
@@ -99,40 +112,52 @@ fun HomeScreen(
             .weight(1f)
             .padding(8.dp)
         ) {
-            Row(modifier = Modifier
-                .fillMaxSize(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                DateSelectorButton(
-                    onDateSelected = onDateSelected,
-                    modifier = Modifier.weight(1f)
-                )
-                Column(
+                Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f)
-                        .padding(start = 16.dp, end = 8.dp, bottom = 8.dp),
-                    verticalArrangement = Arrangement.SpaceEvenly
+                        .fillMaxWidth()
+                        //.fillMaxHeight(0.4f)
+                        .weight(2f)
                 ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        SpendingProgressBar(
-                            totalSpent = currentMonthExpense,
-                            monthlyLimit = monthlyExpenseLimit,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 2.dp, top = 4.dp, bottom = 8.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                        )
-                    }
+                    SpendingProgressBar(
+                        totalSpent = currentMonthExpense,
+                        monthlyLimit = monthlyExpenseLimit,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(start = 2.dp, top = 4.dp, bottom = 8.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .padding(top = 8.dp, bottom = 8.dp)
+                        .weight(3.5f)
+                        .fillMaxSize(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    DateSelectorButton(
+                        onDateSelected = onDateSelected,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize()
+                            .padding(end = 8.dp)
+                    )
+
                     Button(
                         onClick = { showDialog = true },
                         modifier = Modifier
                             .fillMaxSize()
-                            .weight(1f),
+                            .weight(1f)
+                            .padding(start = 8.dp),
                         shape = RoundedCornerShape(16.dp),
-                        border = BorderStroke(2.dp, Color.Black)
+                        //border = BorderStroke(2.dp, MaterialTheme.colorScheme.onBackground)
                     ) {
                         Text(text = "Set Monthly Limit")
                     }

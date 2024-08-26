@@ -2,6 +2,7 @@ package com.example.expensetrackerapp.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -58,15 +59,14 @@ fun DateSelectorButton(
         okButtonEnabled = true
     }
 
-
+    val darkTheme = isSystemInDarkTheme()
     Button(
         onClick = { showDatePickerDialog = true },
         modifier = modifier
-            .fillMaxSize()
-            .padding(start = 8.dp, end = 4.dp, top = 4.dp, bottom = 8.dp),
+            .fillMaxSize(),
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-        border = BorderStroke(2.dp, Color.Black)
+        //border = BorderStroke(2.dp, MaterialTheme.colorScheme.onBackground)
     ) {
         Text(text = "Expenses By Date")
     }
@@ -94,12 +94,10 @@ fun DateSelectorButton(
                 }
             },
             //colors = DatePickerColors()
-            colors = DatePickerDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.background
-            ),
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier
-                .border(2.dp, MaterialTheme.colorScheme.primary)
+//            colors = DatePickerDefaults.colors(
+//                MaterialTheme.colorScheme.secondaryContainer
+//            ),
+            shape = RoundedCornerShape(16.dp)
         ) {
             DatePicker(state = datePickerState)
         }

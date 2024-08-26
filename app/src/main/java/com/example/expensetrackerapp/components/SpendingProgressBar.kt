@@ -27,7 +27,9 @@ fun SpendingProgressBar(
 ) {
     val progress = if (monthlyLimit > 0) (totalSpent / monthlyLimit).toFloat() else 0f
 
-    Column {
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
         Text(
             text = "Rs.$totalSpent/$monthlyLimit",
             color = if(progress<1f) MaterialTheme.colorScheme.primary else Color.Red,
@@ -39,7 +41,7 @@ fun SpendingProgressBar(
         Row(
             modifier = modifier
                 .fillMaxSize()
-                .border(4.dp, if (progress < 1f) MaterialTheme.colorScheme.primary else Color.Red)
+                //.border(4.dp, if (progress < 1f) MaterialTheme.colorScheme.primary else Color.Red)
         ) {
             Box(
                 modifier = Modifier
@@ -50,9 +52,9 @@ fun SpendingProgressBar(
             )
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(fraction = (1f - progress).coerceIn(0f, 1f))
+                    .fillMaxWidth(fraction = 1f)
                     .fillMaxHeight()
-                    .background(if (progress < 1f) MaterialTheme.colorScheme.background else Color.Red)
+                    .background(if (progress < 1f) Color.DarkGray else Color.Red)
                     .clip(RoundedCornerShape(16.dp))
             )
         }
