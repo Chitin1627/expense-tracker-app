@@ -192,6 +192,7 @@ fun RegisterScreen(
                 }
                 Spacer(modifier = Modifier.padding(4.dp))
                 Button(
+                    enabled = enableSignUpButton,
                     onClick = {
                         registerOnClick(username, password, email)
                     }
