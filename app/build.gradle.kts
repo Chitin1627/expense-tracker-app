@@ -81,4 +81,6 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    runtimeOnly("com.google.accompanist:accompanist-navigation-animation:0.34.0")
+
 }

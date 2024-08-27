@@ -20,6 +20,7 @@ fun ExpenseByDateScreen(
     expenses: List<Expense>,
     categories: HashMap<String, String>
 ) {
+    println(expenses)
     if(expenses.isNotEmpty()) {
         LazyColumn(
             modifier = Modifier

@@ -14,28 +14,37 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
+    isLoading: Boolean,
+    errorMessage: String?,
     loginOnClick: (String, String) -> Unit
 ) {
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -67,7 +76,18 @@ fun LoginScreen(
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold
         )
+
         Spacer(modifier = Modifier.padding(4.dp))
+
+        errorMessage?.let {
+            Text(
+                text = it,
+                color = Color.Red,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.padding(4.dp))
+        }
 
         OutlinedTextField(
             value = username,
@@ -86,7 +106,6 @@ fun LoginScreen(
             onValueChange = {
                 username = it
             }
-
         )
 
         Spacer(modifier = Modifier.padding(4.dp))
@@ -113,15 +132,26 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.padding(4.dp))
 
-        Button(onClick = {
-            loginOnClick(username, password)
+        if (isLoading) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.primary,
+                strokeWidth = 2.dp
+            )
+        } else {
+            Button(
+                onClick = {
+                    loginOnClick(username, password)
+                }
+            ) {
+                Text(text = "Login")
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
             username = ""
             password = ""
         }
-        ) {
-            Text(text = "Login")
-        }
     }
 }
-
-

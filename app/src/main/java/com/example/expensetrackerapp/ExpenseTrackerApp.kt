@@ -19,7 +19,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.expensetrackerapp.components.CreateExpensePopup
 import com.example.expensetrackerapp.components.appbar.BottomNavBar
 import com.example.expensetrackerapp.components.appbar.AppScreen
 import com.example.expensetrackerapp.components.appbar.MyTopAppBar
@@ -29,9 +28,11 @@ import com.example.expensetrackerapp.data.getToken
 import com.example.expensetrackerapp.data.removeToken
 import com.example.expensetrackerapp.data.removeUsername
 import com.example.expensetrackerapp.data.saveUsername
+import com.example.expensetrackerapp.screens.CreateExpenseScreen
 import com.example.expensetrackerapp.screens.ExpenseByDateScreen
 import com.example.expensetrackerapp.screens.HomeScreen
 import com.example.expensetrackerapp.screens.LoadingScreen
+import com.example.expensetrackerapp.screens.LoginScreen
 import com.example.expensetrackerapp.screens.MainScreen
 import com.example.expensetrackerapp.screens.ProfileScreen
 import kotlinx.coroutines.CoroutineScope
@@ -55,7 +56,7 @@ fun ExpenseTrackerApp(
                 BottomNavBar(
                     navigateTo = { route ->
                         navController.navigate(route) {
-                            popUpTo(navController.graph.startDestinationId) {
+                            popUpTo(AppScreen.Home.route) {
                                 saveState = true
                             }
                             launchSingleTop = true
@@ -75,7 +76,9 @@ fun ExpenseTrackerApp(
             }
         }
     ) { innerPadding ->
-        NavHost(navController = navController, startDestination = AppScreen.Validating.route, Modifier.padding(innerPadding)) {
+        NavHost(
+            navController = navController, startDestination = AppScreen.Validating.route, Modifier.padding(innerPadding),
+        ) {
             composable(
                 AppScreen.Home.route,
                 enterTransition = defaultEnterTransition(),
@@ -88,14 +91,14 @@ fun ExpenseTrackerApp(
                     appViewModel.getExpensesFromApi(context)
                     appViewModel.getCategoriesFromApi(context)
                     appViewModel.getSpendingLimitFromApi(context)
+                    appViewModel.calculateExpenseByCategory()
+                    appViewModel.setListOfExpenseByCategory()
+                    appViewModel.calculateCurrentMonthExpense()
                     isLoading = false
                 }
                 if (isLoading) {
                     LoadingScreen()
                 } else {
-                    appViewModel.calculateExpenseByCategory()
-                    appViewModel.setListOfExpenseByCategory()
-                    appViewModel.calculateCurrentMonthExpense()
                     HomeScreen(
                         expenseByCategory = appViewModel.getListOfExpenseByCategory(),
                         monthlyLimit = appViewModel.getSpendingLimit(),
@@ -108,8 +111,9 @@ fun ExpenseTrackerApp(
                         onDateSelected = {date ->
                             appViewModel.setExpensesByDate(date)
                             navController.navigate(AppScreen.ExpenseByDate.route) {
-                                popUpTo(navController.graph.startDestinationId) {
+                                popUpTo(AppScreen.Home.route) {
                                     saveState = true
+                                    inclusive = true
                                 }
                                 launchSingleTop = true
                                 restoreState = true
@@ -125,34 +129,25 @@ fun ExpenseTrackerApp(
                 popEnterTransition = defaultEnterTransition(),
                 popExitTransition = defaultExitTransition()
             ) {
-                CreateExpensePopup(
+                CreateExpenseScreen(
                     onSave = { amount, category, description, date ->
-                        CoroutineScope(Dispatchers.IO).launch {
-                            try {
-                                appViewModel.createExpense(context, amount, category, description, date)
-                                withContext(Dispatchers.Main) {
-                                    navController.navigate(AppScreen.Home.route) {
-                                        popUpTo(navController.graph.startDestinationId) {
-                                            saveState = true
-                                        }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
-                                }
-                            } catch (e: Exception) {
-                                println("Error creating expense: ${e.message}")
-                            }
+                        try {
+                            appViewModel.createExpense(context, amount, category, description, date)
+                        } catch (e: Exception) {
+                            println("Error creating expense: ${e.message}")
+                            false
                         }
                     },
                     onDismiss = {
                         navController.navigate(AppScreen.Home.route) {
-                            popUpTo(navController.graph.startDestinationId) {
+                            popUpTo(AppScreen.Home.route) {
                                 saveState = true
                             }
                             launchSingleTop = true
                             restoreState = true
                         }
-                    }
+                    },
+                    categoryNameMap = appViewModel.getCategoriesNameMap()
                 )
             }
             composable(
@@ -162,14 +157,16 @@ fun ExpenseTrackerApp(
                 popEnterTransition = defaultEnterTransition(),
                 popExitTransition = defaultExitTransition()
             ) { Greeting(name = "STATS")}
+
             composable(AppScreen.Profile.route) {
                 ProfileScreen(
                     logoutOnClick = {
                         removeToken(context = context)
                         removeUsername(context = context)
                         navController.navigate(AppScreen.Validating.route) {
-                            popUpTo(navController.graph.startDestinationId) {
+                            popUpTo(AppScreen.Home.route) {
                                 saveState = true
+                                inclusive = true
                             }
                             launchSingleTop = true
                             restoreState = true
@@ -186,27 +183,6 @@ fun ExpenseTrackerApp(
             ) {
                 MainScreen(
                     context = context,
-                    loginOnClick = { username, password ->
-                        appViewModel.setUsernamePassword(username, password)
-                        CoroutineScope(Dispatchers.IO).launch {
-                            appViewModel.performLogin(
-                                context = context,
-                                onSuccess = {
-                                    saveUsername(context, username)
-                                    navController.navigate(AppScreen.Home.route) {
-                                        popUpTo(navController.graph.startDestinationId) {
-                                            saveState = true
-                                        }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
-                                },
-                                onError = { error ->
-                                    println("Error: $error")
-                                }
-                            )
-                        }
-                    },
                     validateToken = suspend {
                         val token = getToken(context)
                         if (token != null) {
@@ -217,7 +193,18 @@ fun ExpenseTrackerApp(
                     },
                     goToHome = {
                         navController.navigate(AppScreen.Home.route) {
-                            popUpTo(navController.graph.startDestinationId) {
+                            popUpTo(AppScreen.Validating.route) {
+                                saveState = true
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    goToLogin = {
+                        navController.navigate(AppScreen.Login.route) {
+                            popUpTo(AppScreen.Validating.route) {
+                                inclusive = true
                                 saveState = true
                             }
                             launchSingleTop = true
@@ -237,6 +224,53 @@ fun ExpenseTrackerApp(
                 ExpenseByDateScreen(
                     expenses = appViewModel.getExpensesByDate(),
                     categories = appViewModel.getCategories()
+                )
+            }
+            composable(
+                AppScreen.Login.route,
+                enterTransition = defaultEnterTransition(),
+                exitTransition = defaultExitTransition(),
+                popEnterTransition = defaultEnterTransition(),
+                popExitTransition = defaultExitTransition()
+            ) {
+                val (isLoading, setLoading) = remember { mutableStateOf(false) }
+                val (errorMessage, setErrorMessage) = remember { mutableStateOf<String?>(null) }
+
+                LoginScreen(
+                    isLoading = isLoading,
+                    errorMessage = errorMessage,
+                    loginOnClick = { username, password ->
+                        setLoading(true)
+                        setErrorMessage(null)
+
+                        appViewModel.setUsernamePassword(username, password)
+
+                        CoroutineScope(Dispatchers.IO).launch {
+                            appViewModel.performLogin(
+                                context = context,
+                                onSuccess = {
+                                    saveUsername(context, username)
+                                    navController.navigate(AppScreen.Home.route) {
+                                        popUpTo(AppScreen.Login.route) {
+                                            inclusive = true
+                                        }
+                                        launchSingleTop = true
+                                    }
+                                    setLoading(false) // Hide loading indicator on success
+                                },
+                                onError = { error ->
+                                    println("Error: $error")
+                                    if(error=="HTTP 401 ") {
+                                        setErrorMessage("Username or password is wrong")
+                                    }
+                                    else {
+                                        setErrorMessage("Server Issue. Please try again later")
+                                    }
+                                    setLoading(false)
+                                }
+                            )
+                        }
+                    }
                 )
             }
         }

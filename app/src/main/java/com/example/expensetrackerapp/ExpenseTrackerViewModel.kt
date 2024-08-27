@@ -180,31 +180,31 @@ class ExpenseTrackerViewModel : ViewModel() {
         }
     }
 
-    suspend fun createExpense(context: Context, amount: Double, category: String, description: String, date: String) {
-        val retrofitClient = RetrofitClient(context)
-        val api = retrofitClient.expenseApi
-        withContext(Dispatchers.IO) {
-            try {
-                val categories = uiState.value.categoryNameMap
-                val category_id = categories[category] ?: ""
-                val expense = ExpenseRequest(
-                    username = getUsername(context) ?: "",
-                    amount = amount,
-                    category_id = category_id,
-                    description = description,
-                    date = date
-                )
-                val response = api.createExpense(expense)
-                if (response.isSuccessful) {
-                    println("Expense Created")
-                } else {
-                    println("Error: ${response.code()}")
-                }
-            } catch (e: Exception) {
-                println("Exception: ${e.message}")
-            }
+    suspend fun createExpense(
+        context: Context,
+        amount: Double,
+        category: String,
+        description: String,
+        date: String
+    ): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val retrofitClient = RetrofitClient(context)
+            val api = retrofitClient.expenseApi
+            val expense = ExpenseRequest(
+                username = getUsername(context) ?: "",
+                amount = amount,
+                category_id = category,
+                description = description,
+                date = date
+            )
+            val response = api.createExpense(expense)
+            response.isSuccessful
+        } catch (e: Exception) {
+            println("Exception: ${e.message}")
+            false
         }
     }
+
 
     suspend fun getSpendingLimitFromApi(context: Context) {
         val retrofitClient = RetrofitClient(context)

@@ -14,9 +14,9 @@ import kotlinx.coroutines.delay
 @Composable
 fun MainScreen(
     context: Context,
-    loginOnClick: (String, String) -> Unit,
     validateToken: suspend () -> Boolean,
-    goToHome: () -> Unit
+    goToHome: () -> Unit,
+    goToLogin: () -> Unit
 ) {
     //removeToken(context)
     var isTokenValid by remember { mutableStateOf<Boolean?>(null) }
@@ -37,7 +37,7 @@ fun MainScreen(
     println("IsTokenValid: $isTokenValid")
     when (isTokenValid) {
         true -> goToHome()
-        false -> LoginScreen(loginOnClick = loginOnClick)
+        false -> goToLogin()
         null -> LoadingScreen()
     }
 }

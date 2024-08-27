@@ -40,6 +40,7 @@ import java.util.Locale
 @Composable
 fun DateSelectorButton(
     onDateSelected: (String) -> Unit,
+    text: String,
     modifier: Modifier = Modifier
 ) {
     val datePickerState = rememberDatePickerState(selectableDates = object : SelectableDates {
@@ -59,16 +60,14 @@ fun DateSelectorButton(
         okButtonEnabled = true
     }
 
-    val darkTheme = isSystemInDarkTheme()
     Button(
         onClick = { showDatePickerDialog = true },
-        modifier = modifier
-            .fillMaxSize(),
+        modifier = modifier,
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
         //border = BorderStroke(2.dp, MaterialTheme.colorScheme.onBackground)
     ) {
-        Text(text = "Expenses By Date")
+        Text(text = text)
     }
 
     if(showDatePickerDialog) {

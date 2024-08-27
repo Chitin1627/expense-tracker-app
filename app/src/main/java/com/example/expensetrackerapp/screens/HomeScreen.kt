@@ -28,6 +28,7 @@ import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -57,25 +58,12 @@ fun HomeScreen(
     onSetLimit: (Double) -> Unit,
     onDateSelected: (String) -> Unit,
 ) {
-//    LazyColumn(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(16.dp),
-//        verticalArrangement = Arrangement.spacedBy(8.dp)
-//    ) {
-//        items(expenses) { expense ->
-//            val category = categories[expense.category_id]
-//            if (category != null) {
-//                ExpenseCard(expense, category)
-//            }
-//        }
-//    }
     val context = LocalContext.current
     var showDialog by rememberSaveable {
         mutableStateOf(false)
     }
-    var monthlyExpenseLimit by remember {
-        mutableStateOf(monthlyLimit)
+    var monthlyExpenseLimit by rememberSaveable {
+        mutableDoubleStateOf(monthlyLimit)
     }
 
     Column(
@@ -144,6 +132,7 @@ fun HomeScreen(
                 ) {
                     DateSelectorButton(
                         onDateSelected = onDateSelected,
+                        text = "Expense by Date",
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxSize()
