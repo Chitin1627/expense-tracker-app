@@ -35,6 +35,7 @@ import com.example.expensetrackerapp.screens.LoadingScreen
 import com.example.expensetrackerapp.screens.LoginScreen
 import com.example.expensetrackerapp.screens.MainScreen
 import com.example.expensetrackerapp.screens.ProfileScreen
+import com.example.expensetrackerapp.screens.RegisterScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,11 +49,11 @@ fun ExpenseTrackerApp(
 ) {
     val appUiState by appViewModel.uiState.collectAsState()
     val context = LocalContext.current
+    //removeToken(context)
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-    println("CurrentRoute: $currentRoute")
     Scaffold(
         bottomBar = {
-            if (currentRoute !in listOf(AppScreen.Login.route, AppScreen.Loading.route, AppScreen.Validating.route, null)) {
+            if (currentRoute !in listOf(AppScreen.Login.route, AppScreen.Register.route, AppScreen.Loading.route, AppScreen.Validating.route, null)) {
                 BottomNavBar(
                     navigateTo = { route ->
                         navController.navigate(route) {
@@ -68,7 +69,7 @@ fun ExpenseTrackerApp(
             }
         },
         topBar = {
-            if (currentRoute !in listOf(AppScreen.Login.route, AppScreen.Loading.route, AppScreen.Validating.route, null)) {
+            if (currentRoute !in listOf(AppScreen.Login.route, AppScreen.Register.route, AppScreen.Loading.route, AppScreen.Validating.route, null)) {
                 if (currentRoute != null) {
                     MyTopAppBar(
                         currentScreen = currentRoute.replaceFirstChar(Char::titlecase))
@@ -113,7 +114,6 @@ fun ExpenseTrackerApp(
                             navController.navigate(AppScreen.ExpenseByDate.route) {
                                 popUpTo(AppScreen.Home.route) {
                                     saveState = true
-                                    inclusive = true
                                 }
                                 launchSingleTop = true
                                 restoreState = true
@@ -134,7 +134,6 @@ fun ExpenseTrackerApp(
                         try {
                             appViewModel.createExpense(context, amount, category, description, date)
                         } catch (e: Exception) {
-                            println("Error creating expense: ${e.message}")
                             false
                         }
                     },
@@ -163,13 +162,11 @@ fun ExpenseTrackerApp(
                     logoutOnClick = {
                         removeToken(context = context)
                         removeUsername(context = context)
-                        navController.navigate(AppScreen.Validating.route) {
-                            popUpTo(AppScreen.Home.route) {
-                                saveState = true
+                        navController.navigate(AppScreen.Login.route) {
+                            popUpTo(0) {
                                 inclusive = true
                             }
                             launchSingleTop = true
-                            restoreState = true
                         }
                     }
                 )
@@ -193,7 +190,7 @@ fun ExpenseTrackerApp(
                     },
                     goToHome = {
                         navController.navigate(AppScreen.Home.route) {
-                            popUpTo(AppScreen.Validating.route) {
+                            popUpTo(AppScreen.Register.route) {
                                 saveState = true
                                 inclusive = true
                             }
@@ -203,12 +200,10 @@ fun ExpenseTrackerApp(
                     },
                     goToLogin = {
                         navController.navigate(AppScreen.Login.route) {
-                            popUpTo(AppScreen.Validating.route) {
+                            popUpTo(0) {
                                 inclusive = true
-                                saveState = true
                             }
                             launchSingleTop = true
-                            restoreState = true
                         }
                     }
                 )
@@ -256,10 +251,9 @@ fun ExpenseTrackerApp(
                                         }
                                         launchSingleTop = true
                                     }
-                                    setLoading(false) // Hide loading indicator on success
+                                    setLoading(false)
                                 },
                                 onError = { error ->
-                                    println("Error: $error")
                                     if(error=="HTTP 401 ") {
                                         setErrorMessage("Username or password is wrong")
                                     }
@@ -269,6 +263,64 @@ fun ExpenseTrackerApp(
                                     setLoading(false)
                                 }
                             )
+                        }
+                    },
+                    goToRegister = {
+                        navController.navigate(AppScreen.Register.route) {
+                            popUpTo(0) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+
+            composable(
+                AppScreen.Register.route,
+                enterTransition = defaultEnterTransition(),
+                exitTransition = defaultExitTransition(),
+                popEnterTransition = defaultEnterTransition(),
+                popExitTransition = defaultExitTransition()
+            ) {
+                val (isLoading, setLoading) = remember { mutableStateOf(false) }
+                val (errorMessage, setErrorMessage) = remember { mutableStateOf<String?>(null) }
+
+                RegisterScreen(isLoading = isLoading,
+                    errorMessage = errorMessage,
+                    registerOnClick = { username, password, email ->
+                        setLoading(true)
+                        setErrorMessage(null)
+
+                        appViewModel.setUsernamePassword(username, password)
+                        appViewModel.setEmail(email);
+
+                        CoroutineScope(Dispatchers.IO).launch {
+                            appViewModel.performRegister(
+                                context = context,
+                                onSuccess = {
+                                    saveUsername(context, username)
+                                    navController.navigate(AppScreen.Home.route) {
+                                        popUpTo(AppScreen.Home.route) {
+                                            inclusive = true
+                                        }
+                                        launchSingleTop = true
+                                    }
+                                    setLoading(false)
+                                },
+                                onError = { error ->
+                                    setErrorMessage("Server Issue. Please try again later")
+                                    setLoading(false)
+                                }
+                            )
+                        }
+                    },
+                    goToLogin = {
+                        navController.navigate(AppScreen.Login.route) {
+                            popUpTo(0) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
                         }
                     }
                 )

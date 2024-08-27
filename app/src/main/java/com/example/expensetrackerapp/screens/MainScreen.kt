@@ -22,19 +22,16 @@ fun MainScreen(
     var isTokenValid by remember { mutableStateOf<Boolean?>(null) }
     LaunchedEffect(Unit) {
         val token = getToken(context)
-        println("Current token: $token")
         isTokenValid = if (token != null) {
             try {
                 validateToken()
             } catch (e: Exception) {
-                println("mainscreen: ${e.message}")
                 false
             }
         } else {
             false
         }
     }
-    println("IsTokenValid: $isTokenValid")
     when (isTokenValid) {
         true -> goToHome()
         false -> goToLogin()

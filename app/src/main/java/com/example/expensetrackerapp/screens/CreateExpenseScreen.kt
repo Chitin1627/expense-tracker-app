@@ -188,9 +188,10 @@ fun CreateExpenseScreen(
                             )
                             isLoading = false
                             if (success) {
-                                onDismiss() // Navigate back to home or handle success
-                            } else {
-                                // Handle failure (e.g., show a toast or error message)
+                                onDismiss()
+                            }
+                            else {
+                                errorMessage = "Failed to save expense. Please try again"
                             }
                         }
                     },

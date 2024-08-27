@@ -1,6 +1,5 @@
 package com.example.expensetrackerapp.screens
 
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,10 +11,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -36,19 +35,22 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(
+fun RegisterScreen(
     isLoading: Boolean,
     errorMessage: String?,
-    loginOnClick: (String, String) -> Unit,
-    goToRegister: () -> Unit
+    registerOnClick: (String, String, String) -> Unit,
+    goToLogin: () -> Unit
 ) {
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
+    var enableSignUpButton by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    enableSignUpButton = (username!="" && password!="" && email.contains("@"))
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -76,7 +78,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.padding(4.dp))
 
         Text(
-            text = "Login",
+            text = "Sign Up",
             color = MaterialTheme.colorScheme.onSurface,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold
@@ -93,6 +95,27 @@ fun LoginScreen(
             )
             Spacer(modifier = Modifier.padding(4.dp))
         }
+
+        OutlinedTextField(
+            value = email,
+            label = { Text(text = "Email") },
+            shape = RoundedCornerShape(16.dp),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Next
+            ),
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Email,
+                    contentDescription = "User",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            },
+            onValueChange = {
+                email = it
+            }
+        )
+
+        Spacer(modifier = Modifier.padding(4.dp))
 
         OutlinedTextField(
             value = username,
@@ -152,14 +175,14 @@ fun LoginScreen(
                     modifier = Modifier.padding(top = 4.dp)
                 ) {
                     Text(
-                        text = "Don't have an account? ",
+                        text = "Already have an account? ",
                         style = MaterialTheme.typography.bodyLarge
                     )
 
                     ClickableText(
-                        text = AnnotatedString("Sign up"),
+                        text = AnnotatedString("Log in"),
                         onClick = {
-                            goToRegister()
+                            goToLogin()
                         },
                         style = MaterialTheme.typography.bodyLarge.copy(
                             color = MaterialTheme.colorScheme.primary,
@@ -170,10 +193,10 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.padding(4.dp))
                 Button(
                     onClick = {
-                        loginOnClick(username, password)
+                        registerOnClick(username, password, email)
                     }
                 ) {
-                    Text(text = "Login")
+                    Text(text = "Register")
                 }
             }
         }
@@ -183,6 +206,7 @@ fun LoginScreen(
         onDispose {
             username = ""
             password = ""
+            email = ""
         }
     }
 }

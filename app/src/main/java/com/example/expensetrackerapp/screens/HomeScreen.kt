@@ -62,7 +62,7 @@ fun HomeScreen(
     var showDialog by rememberSaveable {
         mutableStateOf(false)
     }
-    var monthlyExpenseLimit by rememberSaveable {
+    var monthlyExpenseLimit by remember {
         mutableDoubleStateOf(monthlyLimit)
     }
 
@@ -91,13 +91,38 @@ fun HomeScreen(
         }
         Box(modifier = Modifier
             .fillMaxSize()
-            .weight(3f)
+            .weight(5f),
+            contentAlignment = Alignment.Center
         ) {
-            PieChartScreen(pieChartData = expenseByCategory)
+            if(currentMonthExpense==0.0) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Guess you are saving a lot ;)",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Spacer(modifier = Modifier.padding(8.dp))
+                    Text(
+                        text = "You have spent Rs. 0 this month",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+
+            }
+            else {
+                PieChartScreen(pieChartData = expenseByCategory)
+            }
+
         }
         Box(modifier = Modifier
             .fillMaxSize()
-            .weight(1f)
+            .weight(2f)
             .padding(8.dp)
         ) {
             Column(

@@ -7,8 +7,9 @@ import com.example.expensetrackerapp.model.Expense
 data class ExpenseTrackerUiState(
     val username: String = "",
     val password: String = "",
+    val email: String = "",
     val token: String = "",
-    val monthlyLimit: Double = -1.0,
+    val monthlyLimit: Double = 0.0,
     val currentMonthExpense: Double = 0.0,
     val isTokenValid: Boolean = false,
     val expenses: List<Expense> = emptyList(),

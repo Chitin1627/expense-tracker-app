@@ -69,4 +69,11 @@ sealed class AppScreen(
                 Icons.Outlined.Check,
                 "Expense By Date"
             )
+
+    object Register:
+            AppScreen(
+                "Register",
+                Icons.Outlined.Check,
+                "Register"
+            )
 }

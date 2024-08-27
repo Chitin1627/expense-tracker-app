@@ -14,6 +14,7 @@ import com.example.expensetrackerapp.model.Expense
 import com.example.expensetrackerapp.model.ExpenseRequest
 import com.example.expensetrackerapp.model.JwtToken
 import com.example.expensetrackerapp.model.LoginRequest
+import com.example.expensetrackerapp.model.RegisterRequest
 import com.example.expensetrackerapp.model.UserSpendingRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -91,9 +92,30 @@ class ExpenseTrackerViewModel : ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val token = api.login(LoginRequest(username, password))
-                saveToken(context, token)
+                saveToken(context, token.token)
                 withContext(Dispatchers.Main) {
-                    onSuccess(token)
+                    onSuccess(token.token)
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    onError(e.message ?: "An error occurred")
+                }
+            }
+        }
+    }
+
+    suspend fun performRegister(context: Context, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
+        val retrofitClient = RetrofitClient(context)
+        val api = retrofitClient.authApi
+        val username = uiState.value.username
+        val password = uiState.value.password
+        val email = uiState.value.email
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val token = api.register(RegisterRequest(username,email, password))
+                saveToken(context, token.token)
+                withContext(Dispatchers.Main) {
+                    onSuccess(token.token)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
@@ -110,7 +132,6 @@ class ExpenseTrackerViewModel : ViewModel() {
          return withContext(Dispatchers.IO) {
              try {
                  val response = api.validateToken(JwtToken(token))
-                 println("isValid: $response")
                  val isValid = response == "true"
                  withContext(Dispatchers.Main) {
                      _uiState.update { currentState ->
@@ -119,7 +140,6 @@ class ExpenseTrackerViewModel : ViewModel() {
                  }
                  isValid
              } catch (e: Exception) {
-                 println("Error: ${e.message}")
                  withContext(Dispatchers.Main) {
                      _uiState.update { currentState ->
                          currentState.copy(isTokenValid = false)
@@ -136,7 +156,6 @@ class ExpenseTrackerViewModel : ViewModel() {
         return withContext(Dispatchers.IO) {
             try {
                 val response = api.getUserExpenses()
-                println(response)
                 withContext(Dispatchers.Main) {
                     _uiState.update { currentState ->
                         currentState.copy(
@@ -146,7 +165,6 @@ class ExpenseTrackerViewModel : ViewModel() {
                 }
                 response
             } catch(e: Exception) {
-                println(e.message)
                 emptyList()
             }
         }
@@ -174,7 +192,6 @@ class ExpenseTrackerViewModel : ViewModel() {
                 }
                 response
             } catch(e: Exception) {
-                println(e.message)
                 emptyList()
             }
         }
@@ -200,7 +217,6 @@ class ExpenseTrackerViewModel : ViewModel() {
             val response = api.createExpense(expense)
             response.isSuccessful
         } catch (e: Exception) {
-            println("Exception: ${e.message}")
             false
         }
     }
@@ -210,14 +226,20 @@ class ExpenseTrackerViewModel : ViewModel() {
         val retrofitClient = RetrofitClient(context)
         val api = retrofitClient.userSpendingApi
         withContext(Dispatchers.IO) {
-            val response = api.getUserSpending()
-            if(response.username!=null) {
-                _uiState.update { currentState->
-                    currentState.copy(
-                        monthlyLimit = response.monthlyLimit
-                    )
+            try {
+                val response = api.getUserSpending()
+                if(response.username!=null) {
+                    _uiState.update { currentState->
+                        currentState.copy(
+                            monthlyLimit = response.monthlyLimit
+                        )
+                    }
                 }
             }
+            catch (_: Exception) {
+
+            }
+
         }
     }
 
@@ -227,7 +249,6 @@ class ExpenseTrackerViewModel : ViewModel() {
         return withContext(Dispatchers.IO) {
             try {
                 val response = api.setMonthlyLimit(UserSpendingRequest(newLimit))
-                println("isValid: $response")
                 if(response.monthlyLimit==newLimit) {
                     withContext(Dispatchers.IO) {
                         _uiState.update { currentState ->
@@ -344,5 +365,13 @@ class ExpenseTrackerViewModel : ViewModel() {
 
     fun getExpensesByDate(): List<Expense> {
         return uiState.value.expensesByDate
+    }
+
+    fun setEmail(email: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                email = email
+            )
+        }
     }
 }
