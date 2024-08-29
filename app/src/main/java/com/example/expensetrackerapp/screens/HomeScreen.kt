@@ -1,5 +1,7 @@
 package com.example.expensetrackerapp.screens
 
+import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -59,6 +61,10 @@ fun HomeScreen(
     onDateSelected: (String) -> Unit,
 ) {
     val context = LocalContext.current
+    BackHandler {
+        (context as? Activity)?.finish()
+    }
+
     var showDialog by rememberSaveable {
         mutableStateOf(false)
     }

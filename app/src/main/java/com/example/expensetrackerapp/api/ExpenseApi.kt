@@ -7,11 +7,19 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
+import java.util.Date
 
 interface ExpenseApi {
     @GET("/api/expenses/user-expenses")
     suspend fun getUserExpenses(): List<Expense>
 
+    @GET("/api/expenses/user-expenses/current-month")
+    suspend fun getUserExpensesCurrentMonth(): List<Expense>
+
+    @GET("/api/expenses/user-expenses/date")
+    suspend fun getUserExpenseByDate(@Query("date") date: String): List<Expense>
+
     @POST("/api/expenses")
     suspend fun createExpense(@Body expense: ExpenseRequest): Response<Void>
+
 }

@@ -61,6 +61,8 @@ fun CreateExpenseScreen(
 ) {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     val date = dateFormat.format(Date())
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
 
     var amount by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -156,7 +158,8 @@ fun CreateExpenseScreen(
         )
         Spacer(modifier = Modifier.padding(8.dp))
 
-        Text(text = "Selected Date: $selectedDate")
+        Text(text = "Selected Date: ${inputFormat.parse(selectedDate)
+            ?.let { outputFormat.format(it) }}")
 
         Spacer(modifier = Modifier.padding(8.dp))
 

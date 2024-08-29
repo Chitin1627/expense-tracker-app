@@ -6,11 +6,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.expensetrackerapp.components.appbar.AppScreen
 import com.example.expensetrackerapp.data.viewmodels.AddExpenseViewModel
+import com.example.expensetrackerapp.data.viewmodels.HomeScreenViewModel
 import com.example.expensetrackerapp.screens.CreateExpenseScreen
 
 @Composable
 fun CreateExpenseScreenHelper(
     navController: NavHostController,
+    homeScreenViewModel: HomeScreenViewModel,
     context: Context,
     categoryNameMap: HashMap<String, String>
 ) {
@@ -22,7 +24,9 @@ fun CreateExpenseScreenHelper(
             addExpenseViewModel.setDescription(description)
             addExpenseViewModel.setDate(date)
             try {
-                addExpenseViewModel.createExpense(context)
+                val success = addExpenseViewModel.createExpense(context)
+                if(success) homeScreenViewModel.setIsDataLoaded(false)
+                success
             } catch (e: Exception) {
                 false
             }

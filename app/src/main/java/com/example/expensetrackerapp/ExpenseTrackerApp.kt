@@ -38,8 +38,6 @@ fun ExpenseTrackerApp(
 ) {
     //val appUiState by appViewModel.uiState.collectAsState()
     val homeScreenViewModel: HomeScreenViewModel = viewModel()
-    val authenticationViewModel: AuthenticationViewModel = viewModel()
-    val addExpenseViewModel: AddExpenseViewModel = viewModel()
     val context = LocalContext.current
     //removeToken(context)
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -92,6 +90,7 @@ fun ExpenseTrackerApp(
             ) {
                 CreateExpenseScreenHelper(
                     navController = navController,
+                    homeScreenViewModel = homeScreenViewModel,
                     context = context,
                     categoryNameMap = homeScreenViewModel.getCategoriesNameMap()
                 )

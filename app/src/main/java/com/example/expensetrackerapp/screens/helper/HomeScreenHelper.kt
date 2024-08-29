@@ -28,14 +28,18 @@ fun HomeScreenHelper(
 ) {
     var isLoading by remember { mutableStateOf(true) }
     LaunchedEffect(Unit) {
-        homeScreenViewModel.getExpensesFromApi(context)
-        homeScreenViewModel.getCategoriesFromApi(context)
-        homeScreenViewModel.getSpendingLimitFromApi(context)
-        homeScreenViewModel.calculateExpenseByCategory()
-        homeScreenViewModel.setListOfExpenseByCategory()
-        homeScreenViewModel.calculateCurrentMonthExpense()
+        if(!homeScreenViewModel.getIsDataLoaded()) {
+            homeScreenViewModel.getExpensesCurrentMonthFromApi(context)
+            homeScreenViewModel.getCategoriesFromApi(context)
+            homeScreenViewModel.getSpendingLimitFromApi(context)
+            homeScreenViewModel.calculateExpenseByCategory()
+            homeScreenViewModel.setListOfExpenseByCategory()
+            homeScreenViewModel.calculateCurrentMonthExpense()
+        }
         isLoading = false
     }
+
+
     if (isLoading) {
         LoadingScreen()
     } else {
@@ -46,10 +50,11 @@ fun HomeScreenHelper(
             onSetLimit = { limit ->
                 CoroutineScope(Dispatchers.IO).launch {
                     homeScreenViewModel.setSpendingLimitFromApi(limit, context)
+                    homeScreenViewModel.setIsDataLoaded(false)
                 }
             },
             onDateSelected = {date ->
-                homeScreenViewModel.setExpensesByDate(date)
+                homeScreenViewModel.setSelectedDate(date)
                 navController.navigate(AppScreen.ExpenseByDate.route) {
                     popUpTo(AppScreen.Home.route) {
                         saveState = true
