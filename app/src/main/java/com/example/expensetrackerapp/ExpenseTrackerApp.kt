@@ -107,7 +107,10 @@ fun ExpenseTrackerApp(
 
 
             composable(AppScreen.Profile.route) {
-                ProfileScreenHelper(navController = navController, context = context)
+                ProfileScreenHelper(
+                    navController = navController,
+                    homeScreenViewModel = homeScreenViewModel,
+                    context = context)
             }
 
 

@@ -29,12 +29,12 @@ fun HomeScreenHelper(
     var isLoading by remember { mutableStateOf(true) }
     LaunchedEffect(Unit) {
         if(!homeScreenViewModel.getIsDataLoaded()) {
-            homeScreenViewModel.getExpensesCurrentMonthFromApi(context)
+            val response = homeScreenViewModel.getExpensesCurrentMonthFromApi(context)
             homeScreenViewModel.getCategoriesFromApi(context)
+            homeScreenViewModel.calculateExpenseByCategory(response)
+            homeScreenViewModel.calculateCurrentMonthExpense(response)
             homeScreenViewModel.getSpendingLimitFromApi(context)
-            homeScreenViewModel.calculateExpenseByCategory()
             homeScreenViewModel.setListOfExpenseByCategory()
-            homeScreenViewModel.calculateCurrentMonthExpense()
         }
         isLoading = false
     }

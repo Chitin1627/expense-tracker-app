@@ -32,18 +32,6 @@ class HomeScreenViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(HomeScreenUiState())
     val uiState: StateFlow<HomeScreenUiState> = _uiState.asStateFlow()
 
-    fun setExpenses(expenses: List<Expense>) {
-        _uiState.update {currentState ->
-            currentState.copy(
-                expensesCurrentMonth = expenses
-            )
-        }
-    }
-
-    fun getExpensesCurrentMonth(): List<Expense> {
-        return uiState.value.expensesCurrentMonth
-    }
-
     fun setTotalExpense(expenses: List<Expense>) {
         var totalExpense = 0.0
         expenses.forEach { expense ->
@@ -66,21 +54,14 @@ class HomeScreenViewModel : ViewModel() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getExpensesCurrentMonthFromApi(context: Context): List<Expense> {
         val retrofitClient = RetrofitClient(context)
         val api = retrofitClient.expenseApi
         return withContext(Dispatchers.IO) {
             try {
                 val response = api.getUserExpensesCurrentMonth()
-                println(response)
-                withContext(Dispatchers.Main) {
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            expensesCurrentMonth = response,
-                            isDataLoaded = true
-                        )
-                    }
-                }
+                setIsDataLoaded(true)
                 response
             } catch(e: Exception) {
                 emptyList()
@@ -158,10 +139,9 @@ class HomeScreenViewModel : ViewModel() {
         return uiState.value.monthlyLimit
     }
     @RequiresApi(Build.VERSION_CODES.O)
-    fun calculateExpenseByCategory() : HashMap<String, Double>{
+    fun calculateExpenseByCategory(expenses: List<Expense>) : HashMap<String, Double>{
         val expenseByCategory = HashMap<String, Double>()
         val categories = uiState.value.categories
-        val expenses = uiState.value.expensesCurrentMonth
         val currMonth = LocalDate.now().month
         val currYear = LocalDate.now().year
         categories.forEach { (_, name) ->
@@ -214,8 +194,7 @@ class HomeScreenViewModel : ViewModel() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun calculateCurrentMonthExpense() {
-        val expenses = uiState.value.expensesCurrentMonth
+    fun calculateCurrentMonthExpense(expenses: List<Expense>) {
         val currMonth = LocalDate.now().month
         val currYear = LocalDate.now().year
         var currentMonthExpense = 0.0
@@ -294,6 +273,23 @@ class HomeScreenViewModel : ViewModel() {
 
     fun getSelectedDate(): String {
         return uiState.value.selectedDate
+    }
+
+    fun clearState() {
+        _uiState.update {currentState ->
+            currentState.copy(
+                monthlyLimit = 0.0,
+                currentMonthExpense = 0.0,
+                expensesByDate = emptyList(),
+                categories = HashMap<String, String>(),
+                categoryNameMap = HashMap<String, String>(),
+                expenseByCategory = HashMap<String, Double>(),
+                listOfExpenseByCategory = ArrayList<CategoryExpense>(),
+                totalExpense = 0.0,
+                isDataLoaded = false,
+                selectedDate = ""
+            )
+        }
     }
 
 }

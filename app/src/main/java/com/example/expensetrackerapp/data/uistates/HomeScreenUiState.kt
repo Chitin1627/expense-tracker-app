@@ -6,7 +6,6 @@ import com.example.expensetrackerapp.model.Expense
 data class HomeScreenUiState(
     val monthlyLimit: Double = 0.0,
     val currentMonthExpense: Double = 0.0,
-    val expensesCurrentMonth: List<Expense> = emptyList(),
     val expensesByDate: List<Expense> = emptyList(),
     val categories: HashMap<String, String> = HashMap<String, String>(),
     val categoryNameMap: HashMap<String, String> = HashMap<String, String>(),
