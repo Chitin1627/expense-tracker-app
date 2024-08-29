@@ -1,17 +1,11 @@
-package com.example.expensetrackerapp.data
+package com.example.expensetrackerapp.data.uistates
 
-import com.example.expensetrackerapp.model.Category
 import com.example.expensetrackerapp.model.CategoryExpense
 import com.example.expensetrackerapp.model.Expense
 
-data class ExpenseTrackerUiState(
-    val username: String = "",
-    val password: String = "",
-    val email: String = "",
-    val token: String = "",
+data class HomeScreenUiState(
     val monthlyLimit: Double = 0.0,
     val currentMonthExpense: Double = 0.0,
-    val isTokenValid: Boolean = false,
     val expenses: List<Expense> = emptyList(),
     val expensesByDate: List<Expense> = emptyList(),
     val categories: HashMap<String, String> = HashMap<String, String>(),

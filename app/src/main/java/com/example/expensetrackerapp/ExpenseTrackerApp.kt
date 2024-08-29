@@ -5,12 +5,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -25,29 +19,27 @@ import com.example.expensetrackerapp.components.appbar.MyTopAppBar
 import com.example.expensetrackerapp.components.defaultEnterTransition
 import com.example.expensetrackerapp.components.defaultExitTransition
 import com.example.expensetrackerapp.data.getToken
-import com.example.expensetrackerapp.data.removeToken
-import com.example.expensetrackerapp.data.removeUsername
-import com.example.expensetrackerapp.data.saveUsername
-import com.example.expensetrackerapp.screens.CreateExpenseScreen
-import com.example.expensetrackerapp.screens.ExpenseByDateScreen
-import com.example.expensetrackerapp.screens.HomeScreen
-import com.example.expensetrackerapp.screens.LoadingScreen
-import com.example.expensetrackerapp.screens.LoginScreen
+import com.example.expensetrackerapp.data.viewmodels.AddExpenseViewModel
+import com.example.expensetrackerapp.data.viewmodels.AuthenticationViewModel
+import com.example.expensetrackerapp.data.viewmodels.HomeScreenViewModel
 import com.example.expensetrackerapp.screens.MainScreen
-import com.example.expensetrackerapp.screens.ProfileScreen
-import com.example.expensetrackerapp.screens.RegisterScreen
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.example.expensetrackerapp.screens.helper.CreateExpenseScreenHelper
+import com.example.expensetrackerapp.screens.helper.ExpenseByDateScreenHelper
+import com.example.expensetrackerapp.screens.helper.HomeScreenHelper
+import com.example.expensetrackerapp.screens.helper.LoginScreenHelper
+import com.example.expensetrackerapp.screens.helper.MainScreenHelper
+import com.example.expensetrackerapp.screens.helper.ProfileScreenHelper
+import com.example.expensetrackerapp.screens.helper.RegisterScreenHelper
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ExpenseTrackerApp(
-    appViewModel: ExpenseTrackerViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
-    val appUiState by appViewModel.uiState.collectAsState()
+    //val appUiState by appViewModel.uiState.collectAsState()
+    val homeScreenViewModel: HomeScreenViewModel = viewModel()
+    val authenticationViewModel: AuthenticationViewModel = viewModel()
+    val addExpenseViewModel: AddExpenseViewModel = viewModel()
     val context = LocalContext.current
     //removeToken(context)
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -87,41 +79,10 @@ fun ExpenseTrackerApp(
                 popEnterTransition = defaultEnterTransition(),
                 popExitTransition = defaultExitTransition()
             ) {
-                var isLoading by remember { mutableStateOf(true) }
-                LaunchedEffect(Unit) {
-                    appViewModel.getExpensesFromApi(context)
-                    appViewModel.getCategoriesFromApi(context)
-                    appViewModel.getSpendingLimitFromApi(context)
-                    appViewModel.calculateExpenseByCategory()
-                    appViewModel.setListOfExpenseByCategory()
-                    appViewModel.calculateCurrentMonthExpense()
-                    isLoading = false
-                }
-                if (isLoading) {
-                    LoadingScreen()
-                } else {
-                    HomeScreen(
-                        expenseByCategory = appViewModel.getListOfExpenseByCategory(),
-                        monthlyLimit = appViewModel.getSpendingLimit(),
-                        currentMonthExpense = appViewModel.getCurrentMonthExpense(),
-                        onSetLimit = { limit ->
-                            CoroutineScope(Dispatchers.IO).launch {
-                                appViewModel.setSpendingLimitFromApi(limit, context)
-                            }
-                        },
-                        onDateSelected = {date ->
-                            appViewModel.setExpensesByDate(date)
-                            navController.navigate(AppScreen.ExpenseByDate.route) {
-                                popUpTo(AppScreen.Home.route) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    )
-                }
+                HomeScreenHelper(navController = navController, homeScreenViewModel = homeScreenViewModel, context = context)
             }
+
+
             composable(
                 AppScreen.AddExpense.route,
                 enterTransition = defaultEnterTransition(),
@@ -129,26 +90,14 @@ fun ExpenseTrackerApp(
                 popEnterTransition = defaultEnterTransition(),
                 popExitTransition = defaultExitTransition()
             ) {
-                CreateExpenseScreen(
-                    onSave = { amount, category, description, date ->
-                        try {
-                            appViewModel.createExpense(context, amount, category, description, date)
-                        } catch (e: Exception) {
-                            false
-                        }
-                    },
-                    onDismiss = {
-                        navController.navigate(AppScreen.Home.route) {
-                            popUpTo(AppScreen.Home.route) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
-                    categoryNameMap = appViewModel.getCategoriesNameMap()
+                CreateExpenseScreenHelper(
+                    navController = navController,
+                    context = context,
+                    categoryNameMap = homeScreenViewModel.getCategoriesNameMap()
                 )
             }
+
+
             composable(
                 AppScreen.Statistics.route,
                 enterTransition = defaultEnterTransition(),
@@ -157,20 +106,12 @@ fun ExpenseTrackerApp(
                 popExitTransition = defaultExitTransition()
             ) { Greeting(name = "STATS")}
 
+
             composable(AppScreen.Profile.route) {
-                ProfileScreen(
-                    logoutOnClick = {
-                        removeToken(context = context)
-                        removeUsername(context = context)
-                        navController.navigate(AppScreen.Login.route) {
-                            popUpTo(0) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
-                    }
-                )
+                ProfileScreenHelper(navController = navController, context = context)
             }
+
+
             composable(
                 AppScreen.Validating.route,
                 enterTransition = defaultEnterTransition(),
@@ -178,36 +119,9 @@ fun ExpenseTrackerApp(
                 popEnterTransition = defaultEnterTransition(),
                 popExitTransition = defaultExitTransition()
             ) {
-                MainScreen(
-                    context = context,
-                    validateToken = suspend {
-                        val token = getToken(context)
-                        if (token != null) {
-                            appViewModel.setToken(token)
-                        }
-                        val isValid = appViewModel.validateToken(context)
-                        appViewModel.isTokenValid()
-                    },
-                    goToHome = {
-                        navController.navigate(AppScreen.Home.route) {
-                            popUpTo(AppScreen.Register.route) {
-                                saveState = true
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
-                    goToLogin = {
-                        navController.navigate(AppScreen.Login.route) {
-                            popUpTo(0) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
-                    }
-                )
+                MainScreenHelper(navController = navController, context = context)
             }
+
 
             composable(
                 AppScreen.ExpenseByDate.route,
@@ -216,11 +130,10 @@ fun ExpenseTrackerApp(
                 popEnterTransition = defaultEnterTransition(),
                 popExitTransition = defaultExitTransition()
             ) {
-                ExpenseByDateScreen(
-                    expenses = appViewModel.getExpensesByDate(),
-                    categories = appViewModel.getCategories()
-                )
+                ExpenseByDateScreenHelper(navController = navController, homeScreenViewModel = homeScreenViewModel, context = context)
             }
+
+
             composable(
                 AppScreen.Login.route,
                 enterTransition = defaultEnterTransition(),
@@ -228,52 +141,7 @@ fun ExpenseTrackerApp(
                 popEnterTransition = defaultEnterTransition(),
                 popExitTransition = defaultExitTransition()
             ) {
-                val (isLoading, setLoading) = remember { mutableStateOf(false) }
-                val (errorMessage, setErrorMessage) = remember { mutableStateOf<String?>(null) }
-
-                LoginScreen(
-                    isLoading = isLoading,
-                    errorMessage = errorMessage,
-                    loginOnClick = { username, password ->
-                        setLoading(true)
-                        setErrorMessage(null)
-
-                        appViewModel.setUsernamePassword(username, password)
-
-                        CoroutineScope(Dispatchers.IO).launch {
-                            appViewModel.performLogin(
-                                context = context,
-                                onSuccess = {
-                                    saveUsername(context, username)
-                                    navController.navigate(AppScreen.Home.route) {
-                                        popUpTo(AppScreen.Login.route) {
-                                            inclusive = true
-                                        }
-                                        launchSingleTop = true
-                                    }
-                                    setLoading(false)
-                                },
-                                onError = { error ->
-                                    if(error=="HTTP 401 ") {
-                                        setErrorMessage("Username or password is wrong")
-                                    }
-                                    else {
-                                        setErrorMessage("Server Issue. Please try again later")
-                                    }
-                                    setLoading(false)
-                                }
-                            )
-                        }
-                    },
-                    goToRegister = {
-                        navController.navigate(AppScreen.Register.route) {
-                            popUpTo(0) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
-                    }
-                )
+                LoginScreenHelper(navController = navController, context = context)
             }
 
             composable(
@@ -283,47 +151,7 @@ fun ExpenseTrackerApp(
                 popEnterTransition = defaultEnterTransition(),
                 popExitTransition = defaultExitTransition()
             ) {
-                val (isLoading, setLoading) = remember { mutableStateOf(false) }
-                val (errorMessage, setErrorMessage) = remember { mutableStateOf<String?>(null) }
-
-                RegisterScreen(isLoading = isLoading,
-                    errorMessage = errorMessage,
-                    registerOnClick = { username, password, email ->
-                        setLoading(true)
-                        setErrorMessage(null)
-
-                        appViewModel.setUsernamePassword(username, password)
-                        appViewModel.setEmail(email);
-
-                        CoroutineScope(Dispatchers.IO).launch {
-                            appViewModel.performRegister(
-                                context = context,
-                                onSuccess = {
-                                    saveUsername(context, username)
-                                    navController.navigate(AppScreen.Home.route) {
-                                        popUpTo(AppScreen.Home.route) {
-                                            inclusive = true
-                                        }
-                                        launchSingleTop = true
-                                    }
-                                    setLoading(false)
-                                },
-                                onError = { error ->
-                                    setErrorMessage("Server Issue. Please try again later")
-                                    setLoading(false)
-                                }
-                            )
-                        }
-                    },
-                    goToLogin = {
-                        navController.navigate(AppScreen.Login.route) {
-                            popUpTo(0) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
-                    }
-                )
+                RegisterScreenHelper(navController = navController, context = context)
             }
         }
     }

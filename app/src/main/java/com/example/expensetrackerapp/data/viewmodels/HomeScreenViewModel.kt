@@ -1,11 +1,11 @@
-package com.example.expensetrackerapp
+package com.example.expensetrackerapp.data.viewmodels
 
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import com.example.expensetrackerapp.api.RetrofitClient
-import com.example.expensetrackerapp.data.ExpenseTrackerUiState
+import com.example.expensetrackerapp.data.uistates.HomeScreenUiState
 import com.example.expensetrackerapp.data.getUsername
 import com.example.expensetrackerapp.data.saveToken
 import com.example.expensetrackerapp.model.Category
@@ -27,18 +27,9 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class ExpenseTrackerViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(ExpenseTrackerUiState())
-    val uiState: StateFlow<ExpenseTrackerUiState> = _uiState.asStateFlow()
-
-    fun setUsernamePassword(username: String, password: String) {
-        _uiState.update {currentState ->
-            currentState.copy(
-                username = username,
-                password = password
-            )
-        }
-    }
+class HomeScreenViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow(HomeScreenUiState())
+    val uiState: StateFlow<HomeScreenUiState> = _uiState.asStateFlow()
 
     fun setExpenses(expenses: List<Expense>) {
         _uiState.update {currentState ->
@@ -64,13 +55,6 @@ class ExpenseTrackerViewModel : ViewModel() {
         }
     }
 
-    fun setToken(token: String) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                token = token
-            )
-        }
-    }
 
     fun getCategories(): HashMap<String, String> {
         return uiState.value.categories
@@ -80,75 +64,6 @@ class ExpenseTrackerViewModel : ViewModel() {
         return uiState.value.categoryNameMap
     }
 
-    fun isTokenValid(): Boolean {
-        return uiState.value.isTokenValid
-    }
-
-    suspend fun performLogin(context: Context, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
-        val retrofitClient = RetrofitClient(context)
-        val api = retrofitClient.authApi
-        val username = uiState.value.username
-        val password = uiState.value.password
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val token = api.login(LoginRequest(username, password))
-                saveToken(context, token.token)
-                withContext(Dispatchers.Main) {
-                    onSuccess(token.token)
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    onError(e.message ?: "An error occurred")
-                }
-            }
-        }
-    }
-
-    suspend fun performRegister(context: Context, onSuccess: (String) -> Unit, onError: (String) -> Unit) {
-        val retrofitClient = RetrofitClient(context)
-        val api = retrofitClient.authApi
-        val username = uiState.value.username
-        val password = uiState.value.password
-        val email = uiState.value.email
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val token = api.register(RegisterRequest(username,email, password))
-                saveToken(context, token.token)
-                withContext(Dispatchers.Main) {
-                    onSuccess(token.token)
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    onError(e.message ?: "An error occurred")
-                }
-            }
-        }
-    }
-
-     suspend fun validateToken(context: Context): Boolean{
-         val retrofitClient = RetrofitClient(context)
-         val api = retrofitClient.authApi
-         val token = uiState.value.token
-         return withContext(Dispatchers.IO) {
-             try {
-                 val response = api.validateToken(JwtToken(token))
-                 val isValid = response == "true"
-                 withContext(Dispatchers.Main) {
-                     _uiState.update { currentState ->
-                         currentState.copy(isTokenValid = isValid)
-                     }
-                 }
-                 isValid
-             } catch (e: Exception) {
-                 withContext(Dispatchers.Main) {
-                     _uiState.update { currentState ->
-                         currentState.copy(isTokenValid = false)
-                     }
-                 }
-                 false
-             }
-         }
-    }
 
     suspend fun getExpensesFromApi(context: Context): List<Expense> {
         val retrofitClient = RetrofitClient(context)
@@ -194,30 +109,6 @@ class ExpenseTrackerViewModel : ViewModel() {
             } catch(e: Exception) {
                 emptyList()
             }
-        }
-    }
-
-    suspend fun createExpense(
-        context: Context,
-        amount: Double,
-        category: String,
-        description: String,
-        date: String
-    ): Boolean = withContext(Dispatchers.IO) {
-        try {
-            val retrofitClient = RetrofitClient(context)
-            val api = retrofitClient.expenseApi
-            val expense = ExpenseRequest(
-                username = getUsername(context) ?: "",
-                amount = amount,
-                category_id = category,
-                description = description,
-                date = date
-            )
-            val response = api.createExpense(expense)
-            response.isSuccessful
-        } catch (e: Exception) {
-            false
         }
     }
 
@@ -367,11 +258,4 @@ class ExpenseTrackerViewModel : ViewModel() {
         return uiState.value.expensesByDate
     }
 
-    fun setEmail(email: String) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                email = email
-            )
-        }
-    }
 }
