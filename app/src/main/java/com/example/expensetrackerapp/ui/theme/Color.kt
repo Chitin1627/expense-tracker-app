@@ -1,42 +1,39 @@
 package com.example.expensetrackerapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 
-// Light Theme Colors
-val GreenLight = Color(0xFF367E18)  // A bright green
-val BlackLight = Color(0xFF000000)  // Black
-val SpringGreen = Color(0xFF00FF7F)
-
-// Dark Theme Colors
-val GreenDark = Color(0xFF1D813E)   // A brighter green for dark mode
-val BlackDark = Color(0xFF191A19)   // Dark black for background in dark mode
-val GreenDarker = Color(0xFF023020)
-
-val White = Color(0xFFECFFDC)       // White
-val Gray = Color(0xFFBDBDBD)        // Light gray for labels
+val LightBluePrimary = Color(0xFF0D47A1)
+val LightBlueSecondary = Color(0xFF64B5F6)
+val LightBackground = Color(0xFFE3F2FD)
+val LightSurface = Color(0xFFFFFFFF)
+val LightOnPrimary = Color(0xFFFFFFFF)
+val LightOnSecondary = Color(0xFF000000)
+val LightOnBackground = Color(0xFF000000)
+val LightOnSurface = Color(0xFF000000)
 
 
-val LightPrimaryBlue = Color(0xFF2196F3)
-val LightSecondaryOrange = Color(0xFFFF9800)
-val LightAccentGreen = Color(0xFF4CAF50)
-val LightPurple = Color(0xFF9C27B0)
-val LightTeal = Color(0xFF009688)
-val LightYellow = Color(0xFFFFEB3B)
-val LightRed = Color(0xFFF44336)
-val LightPink = Color(0xFFE91E63)
+val DarkBluePrimary = Color(0xFF1565C0)
+val DarkBlueSecondary = Color(0xFF1976D2)
+val DarkBackground = Color(0xFF121212)
+val DarkSurface = Color(0xFF1A1A1A)
+val DarkOnPrimary = Color(0xFFE3F2FD)
+val DarkOnSecondary = Color(0xFFBBDEFB)
+val DarkOnBackground = Color(0xFFE0E0E0)
+val DarkOnSurface = Color(0xFFE0E0E0)
 
-// Dark Mode Colors
-val DarkDeepBlue = Color(0xFFF0E68C)
-val DarkAmber = Color(0xFFFFC107)
-val DarkDeepGreen = Color(0xFF388E3C)
-val DarkIndigo = Color(0xFF5C6BC0)
-val DarkCyan = Color(0xFF00ACC1)
-val DarkLime = Color(0xFFCDDC39)
-val DarkCrimson = Color(0xFFD32F2F)
-val DarkMagenta = Color(0xFFC2185B)
-val Khaki = Color(0xFFF0E68C)
-val Forest = Color(0xFF228B22)
-val Mint = Color(0xFF3EB489)
-val Apple = Color(0xFF76CD26)
-val Basil = Color(0xFF829F82)
-val Pastel = Color(0xFF77DD77)
+val DarkBlue = Color(0xFF003366).toArgb()
+val MediumBlue = Color(0xFF0033CC).toArgb()
+val BrightBlue = Color(0xFF00BFFF).toArgb()
+val SkyBlue = Color(0xFF87CEEB).toArgb()
+val LightSkyBlue = Color(0xFF87CEFA).toArgb()
+val SteelBlue = Color(0xFF4682B4).toArgb()
+val RoyalBlue = Color(0xFF4169E1).toArgb()
+val DodgerBlue = Color(0xFF1E90FF).toArgb()
+val LightCyan = Color(0xFFE0FFFF).toArgb()
+val Teal = Color(0xFF008080).toArgb()
+val Turquoise = Color(0xFF40E0D0).toArgb()
+val Coral = Color(0xFFFF7F50).toArgb()
+val Orange = Color(0xFFFFA500).toArgb()
+val MediumPurple = Color(0xFF9370DB).toArgb()
+val LightGray = Color(0xFFD3D3D3).toArgb()

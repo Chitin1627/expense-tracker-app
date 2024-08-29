@@ -54,8 +54,8 @@ fun DateSelectorButton(
         date
     } ?: ""
 
-    var okButtonEnabled by rememberSaveable { mutableStateOf(false) }
-    var showDatePickerDialog by rememberSaveable { mutableStateOf(false) }
+    var okButtonEnabled by remember { mutableStateOf(false) }
+    var showDatePickerDialog by remember { mutableStateOf(false) }
     if(selectedDate!="") {
         okButtonEnabled = true
     }

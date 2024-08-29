@@ -35,6 +35,7 @@ fun ExpenseByDateScreenHelper(
     }
     else {
         ExpenseByDateScreen(
+            date = homeScreenViewModel.getSelectedDate(),
             expenses = expenseByDate,
             categories = homeScreenViewModel.getCategories()
         )
