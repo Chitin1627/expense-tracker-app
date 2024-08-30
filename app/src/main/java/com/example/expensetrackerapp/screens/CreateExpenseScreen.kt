@@ -1,29 +1,21 @@
 package com.example.expensetrackerapp.screens
 
-import android.app.DatePickerDialog
-import android.widget.Toast
-import androidx.compose.foundation.border
+
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -37,7 +29,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -46,9 +37,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.time.DateTimeException
-import java.time.format.DateTimeFormatter
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -64,14 +52,14 @@ fun CreateExpenseScreen(
     val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
 
-    var amount by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf("") }
-    var selectedDate by remember { mutableStateOf(date) }
-    var expanded by remember { mutableStateOf(false) }
-    var saveButtonEnabled by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var amount by rememberSaveable { mutableStateOf("") }
+    var description by rememberSaveable { mutableStateOf("") }
+    var category by rememberSaveable { mutableStateOf("") }
+    var selectedDate by rememberSaveable { mutableStateOf(date) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    var saveButtonEnabled by rememberSaveable { mutableStateOf(false) }
+    var isLoading by rememberSaveable { mutableStateOf(false) }
+    var errorMessage by rememberSaveable { mutableStateOf<String?>(null) }
 
     saveButtonEnabled = (amount != "" && !amount.contains("-") && categoryNameMap[category] != null)
 
@@ -82,6 +70,15 @@ fun CreateExpenseScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        
+        Text(
+            text = "Don't put any personal information",
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.padding(8.dp))
+
         OutlinedTextField(
             value = amount,
             label = { Text(text = "Amount") },
@@ -158,8 +155,11 @@ fun CreateExpenseScreen(
         )
         Spacer(modifier = Modifier.padding(8.dp))
 
-        Text(text = "Selected Date: ${inputFormat.parse(selectedDate)
-            ?.let { outputFormat.format(it) }}")
+        Text(
+            text = "Selected Date: ${inputFormat.parse(selectedDate)
+            ?.let { outputFormat.format(it) }}",
+            color = MaterialTheme.colorScheme.primary
+        )
 
         Spacer(modifier = Modifier.padding(8.dp))
 

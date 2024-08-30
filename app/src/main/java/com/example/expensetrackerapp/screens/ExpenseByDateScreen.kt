@@ -26,7 +26,8 @@ import java.util.Locale
 fun ExpenseByDateScreen(
     date: String,
     expenses: List<Expense>,
-    categories: HashMap<String, String>
+    categories: HashMap<String, String>,
+    onExpenseDelete: (String) -> Unit
 ) {
     val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
@@ -67,6 +68,9 @@ fun ExpenseByDateScreen(
                             isExpanded = expandedCardId == expense._id,
                             onCardClick = { expenseId ->
                                 expandedCardId = if (expandedCardId == expenseId) null else expenseId
+                            },
+                            onDeleteClick = {expenseId ->
+                                onExpenseDelete(expenseId)
                             }
                         )
                     }

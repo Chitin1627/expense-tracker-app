@@ -13,6 +13,9 @@ import com.example.expensetrackerapp.data.viewmodels.HomeScreenViewModel
 import com.example.expensetrackerapp.model.Expense
 import com.example.expensetrackerapp.screens.ExpenseByDateScreen
 import com.example.expensetrackerapp.screens.LoadingScreen
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.math.exp
 
 @Composable
@@ -37,8 +40,13 @@ fun ExpenseByDateScreenHelper(
         ExpenseByDateScreen(
             date = homeScreenViewModel.getSelectedDate(),
             expenses = expenseByDate,
-            categories = homeScreenViewModel.getCategories()
+            categories = homeScreenViewModel.getCategories(),
+            onExpenseDelete = {expenseId ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    homeScreenViewModel.deleteExpense(context, expenseId)
+                    homeScreenViewModel.setIsDataLoaded(false)
+                }
+            }
         )
     }
-
 }

@@ -275,6 +275,19 @@ class HomeScreenViewModel : ViewModel() {
         return uiState.value.selectedDate
     }
 
+    suspend fun deleteExpense(context: Context, id: String): Boolean {
+        val retrofitClient = RetrofitClient(context)
+        val api = retrofitClient.expenseApi
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = api.deleteExpense(id)
+                response.isSuccessful
+            } catch(e: Exception) {
+                false
+            }
+        }
+    }
+
     fun clearState() {
         _uiState.update {currentState ->
             currentState.copy(

@@ -127,10 +127,6 @@ fun ExpenseTrackerApp(
 
             composable(
                 AppScreen.ExpenseByDate.route,
-                enterTransition = defaultEnterTransition(),
-                exitTransition = defaultExitTransition(),
-                popEnterTransition = defaultEnterTransition(),
-                popExitTransition = defaultExitTransition()
             ) {
                 ExpenseByDateScreenHelper(navController = navController, homeScreenViewModel = homeScreenViewModel, context = context)
             }
