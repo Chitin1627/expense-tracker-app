@@ -38,6 +38,7 @@ fun ExpenseTrackerApp(
 ) {
     //val appUiState by appViewModel.uiState.collectAsState()
     val homeScreenViewModel: HomeScreenViewModel = viewModel()
+    val authenticationViewModel: AuthenticationViewModel = viewModel()
     val context = LocalContext.current
     //removeToken(context)
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route

@@ -152,25 +152,17 @@ fun ExpenseCard(
     }
 
     if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text(text = "Confirm Delete") },
-            text = { Text(text = "Are you sure you want to delete this expense?") },
-            confirmButton = {
-                TextButton(onClick = {
-                    showDialog = false
-                    onDeleteClick(expense._id)
-                    isVisible = false
-                }) {
-                    Text("Delete")
-                }
+        AppAlertDialog(
+            title = "Confirm Delete",
+            text = "Are you sure you want to delete this expense?",
+            onClickConfirm = {
+                showDialog = false
+                onDeleteClick(expense._id)
+                isVisible = false
             },
-            dismissButton = {
-                TextButton(onClick = { showDialog = false }) {
-                    Text("Cancel")
-                }
-            },
-            containerColor = MaterialTheme.colorScheme.background
+            onClickDismiss = {
+                showDialog = false
+            }
         )
     }
 }

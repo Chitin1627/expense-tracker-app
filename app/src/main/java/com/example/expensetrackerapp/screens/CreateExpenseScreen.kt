@@ -29,8 +29,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.expensetrackerapp.components.DateSelectorButton
 import kotlinx.coroutines.CoroutineScope
@@ -74,7 +76,9 @@ fun CreateExpenseScreen(
         Text(
             text = "Don't put any personal information",
             style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
         )
 
         Spacer(modifier = Modifier.padding(8.dp))
@@ -158,7 +162,8 @@ fun CreateExpenseScreen(
         Text(
             text = "Selected Date: ${inputFormat.parse(selectedDate)
             ?.let { outputFormat.format(it) }}",
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold
         )
 
         Spacer(modifier = Modifier.padding(8.dp))

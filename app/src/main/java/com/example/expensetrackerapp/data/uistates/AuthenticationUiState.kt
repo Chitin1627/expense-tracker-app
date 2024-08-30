@@ -6,4 +6,5 @@ data class AuthenticationUiState(
     val email: String = "",
     val token: String = "",
     val isTokenValid: Boolean = false,
+    val isDataLoaded: Boolean = false
 )

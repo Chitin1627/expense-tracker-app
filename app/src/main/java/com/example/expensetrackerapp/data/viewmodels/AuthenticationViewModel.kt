@@ -1,22 +1,16 @@
 package com.example.expensetrackerapp.data.viewmodels
 
 import android.content.Context
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import com.example.expensetrackerapp.api.RetrofitClient
-import com.example.expensetrackerapp.data.uistates.HomeScreenUiState
-import com.example.expensetrackerapp.data.getUsername
 import com.example.expensetrackerapp.data.saveToken
 import com.example.expensetrackerapp.data.uistates.AuthenticationUiState
-import com.example.expensetrackerapp.model.Category
-import com.example.expensetrackerapp.model.CategoryExpense
-import com.example.expensetrackerapp.model.Expense
-import com.example.expensetrackerapp.model.ExpenseRequest
+import com.example.expensetrackerapp.model.PasswordChangeResponse
 import com.example.expensetrackerapp.model.JwtToken
 import com.example.expensetrackerapp.model.LoginRequest
+import com.example.expensetrackerapp.model.PasswordChangeRequest
 import com.example.expensetrackerapp.model.RegisterRequest
-import com.example.expensetrackerapp.model.UserSpendingRequest
+import com.example.expensetrackerapp.model.UserDetails
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,8 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 class AuthenticationViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(AuthenticationUiState())
@@ -142,4 +134,79 @@ class AuthenticationViewModel : ViewModel() {
             }
         }
     }
+
+    suspend fun getUserDetailsFromApi(context: Context): UserDetails {
+        val retrofitClient = RetrofitClient(context)
+        val api = retrofitClient.userApi
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = api.getUserDetails()
+                setIsDataLoaded(true)
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        username = response.username,
+                        email = response.email
+                    )
+                }
+                response
+            } catch (e: Exception) {
+                UserDetails()
+            }
+        }
+    }
+
+
+    suspend fun changePassword(context: Context, passwordChangeRequest: PasswordChangeRequest): PasswordChangeResponse {
+        val retrofitClient = RetrofitClient(context)
+        val api = retrofitClient.userApi
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = api.changePassword(passwordChangeRequest)
+                println(response)
+                if(response.isSuccessful) {
+                    PasswordChangeResponse(
+                        true,
+                        "Password Changed Successfully"
+                    )
+                } else {
+                    println("Error: ${response.errorBody()?.string()}")
+                    PasswordChangeResponse(
+                        false,
+                        "Current Password is wrong"
+                    )
+                }
+            } catch (e: Exception) {
+                println(e.message)
+                PasswordChangeResponse(
+                    false,
+                    "Server Error"
+                )
+            }
+        }
+    }
+
+    suspend fun deleteAccount(context: Context): Boolean {
+        val retrofitClient = RetrofitClient(context)
+        val api = retrofitClient.userApi
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = api.deleteUser()
+                response.isSuccessful
+            } catch (e: Exception) {
+                false
+            }
+        }
+    }
+
+    fun getIsDataLoaded(): Boolean {
+        return uiState.value.isDataLoaded
+    }
+    private fun setIsDataLoaded(isDataLoaded: Boolean) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                isDataLoaded = isDataLoaded
+            )
+        }
+    }
+
 }

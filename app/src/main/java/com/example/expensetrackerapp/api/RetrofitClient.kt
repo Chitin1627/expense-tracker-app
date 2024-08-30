@@ -15,7 +15,6 @@ class RetrofitClient(context: Context) {
 
     private val BASE_URL = "https://expense-tracker-backend-moo6.onrender.com/"
 
-    // Create a logging interceptor to log the details of HTTP requests/responses
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
@@ -63,8 +62,7 @@ class RetrofitClient(context: Context) {
         retrofit.create(UserSpendingApi::class.java)
     }
 
-    fun setUsernamePassword(user: String, pass: String) {
-        username = user
-        password = pass
+    val userApi: UserApi by lazy {
+        retrofit.create(UserApi::class.java)
     }
 }

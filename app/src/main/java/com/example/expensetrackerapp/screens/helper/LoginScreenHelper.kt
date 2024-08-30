@@ -44,6 +44,7 @@ fun LoginScreenHelper(
                             launchSingleTop = true
                         }
                         setLoading(false)
+                        authenticationViewModel.setUsernamePassword(username, "")
                     },
                     onError = { error ->
                         if(error=="HTTP 401 ") {
