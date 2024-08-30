@@ -13,11 +13,13 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -30,12 +32,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.example.expensetrackerapp.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,6 +54,9 @@ fun LoginScreen(
 ) {
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
+    var showPassword by rememberSaveable {
+        mutableStateOf(false)
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -129,10 +137,24 @@ fun LoginScreen(
                     tint = MaterialTheme.colorScheme.primary
                 )
             },
+            trailingIcon = {
+                IconButton(
+                    onClick = {showPassword = !showPassword}
+                ) {
+                    Icon(
+                        painter =
+                            if(showPassword) painterResource(id = R.drawable.visibility_on)
+                            else painterResource(id = R.drawable.visibility_off),
+                        contentDescription = "Show password",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+            },
             onValueChange = {
                 password = it
             },
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = if(!showPassword) PasswordVisualTransformation() else VisualTransformation.None
         )
 
         Spacer(modifier = Modifier.padding(4.dp))
@@ -184,6 +206,7 @@ fun LoginScreen(
         onDispose {
             username = ""
             password = ""
+            showPassword = false
         }
     }
 }
