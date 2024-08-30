@@ -34,6 +34,7 @@ import com.example.expensetrackerapp.model.PasswordChangeResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @Composable
@@ -41,18 +42,21 @@ fun ProfileScreen(
     username: String,
     email: String,
     changePassword: suspend (String, String) -> PasswordChangeResponse,
-    logoutOnClick: () -> Unit
+    logoutOnClick: () -> Unit,
+    deleteAccount: suspend () -> Boolean
 ) {
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var passwordChangeSuccess by remember { mutableStateOf(false) }
     var passwordChangeText by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
+    var isChangePasswordLoading by remember { mutableStateOf(false) }
+    var isDeleteAccountLoading by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     var dialogText by remember { mutableStateOf("") }
     var dialogTitle by remember { mutableStateOf("") }
     var dialogConfirm by remember { mutableStateOf({}) }
+    var deleteAccountConfirm by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -154,7 +158,7 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if(isLoading) {
+            if(isChangePasswordLoading) {
                 CircularProgressIndicator()
             }
             else {
@@ -164,10 +168,10 @@ fun ProfileScreen(
                         dialogText = "Are you sure you want to change you password?"
                         dialogConfirm = {
                             if (newPassword == confirmPassword && newPassword.isNotEmpty()) {
-                                isLoading = true
+                                isChangePasswordLoading = true
                                 CoroutineScope(Dispatchers.IO).launch {
                                     val response = changePassword(currentPassword, newPassword)
-                                    isLoading = false
+                                    isChangePasswordLoading = false
                                     println("Profile error: ${response.message}")
                                     passwordChangeSuccess = response.success
                                     passwordChangeText = response.message
@@ -203,13 +207,36 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.End
         ) {
             Row {
-                Button(
-                    onClick = { /*TODO*/ },
-                    colors = ButtonDefaults.buttonColors(
-                        Color.Red
+                if(isDeleteAccountLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.padding(end = 8.dp)
                     )
-                ) {
-                    Text(text = "Delete account")
+                }
+                else {
+                    Button(
+                        onClick = {
+                            dialogTitle = "Confirm Delete Account"
+                            dialogText = "Are you sure you want to delete your account?"
+                            dialogConfirm = {
+                                isDeleteAccountLoading = true
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    deleteAccountConfirm = deleteAccount()
+                                    isDeleteAccountLoading = false
+                                    withContext(Dispatchers.Main) {
+                                        if(deleteAccountConfirm) {
+                                            logoutOnClick()
+                                        }
+                                    }
+                                }
+                            }
+                            showDialog = true
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            Color.Red
+                        )
+                    ) {
+                        Text(text = "Delete account")
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -234,6 +261,7 @@ fun ProfileScreen(
                 onClickDismiss = {showDialog = false}
             )
         }
+
         if(passwordChangeSuccess) {
             currentPassword = ""
             newPassword = ""

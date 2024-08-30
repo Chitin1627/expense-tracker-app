@@ -61,6 +61,9 @@ fun ProfileScreenHelper(
                     }
                     launchSingleTop = true
                 }
+            },
+            deleteAccount = {
+                authenticationViewModel.deleteAccount(context)
             }
         )
     }
