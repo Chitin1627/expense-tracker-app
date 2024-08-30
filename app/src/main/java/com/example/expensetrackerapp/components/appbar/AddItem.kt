@@ -17,7 +17,10 @@ fun RowScope.AddItem(
 ) {
     NavigationBarItem(
         label = {
-            Text(text = screen.title)
+            Text(
+                text = screen.title,
+                style = MaterialTheme.typography.labelSmall
+            )
         },
         icon = {
             Icon(

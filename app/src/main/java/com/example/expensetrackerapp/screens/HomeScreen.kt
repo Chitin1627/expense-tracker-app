@@ -84,15 +84,15 @@ fun HomeScreen(
             Text(
                 text = "Hello ",
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 8.dp)
             )
             Text(
-                text = "${getUsername(context)?.replaceFirstChar(Char::titlecase)},",
+                text = "${getUsername(context)?.replaceFirstChar(Char::titlecase)}!",
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.headlineMedium,
             )
         }
         Box(modifier = Modifier
@@ -110,14 +110,29 @@ fun HomeScreen(
                     Text(
                         text = "Guess you are saving a lot ;)",
                         color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    Spacer(modifier = Modifier.padding(8.dp))
-                    Text(
-                        text = "You have spent Rs. 0 this month",
-                        color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleMedium
                     )
+                    Spacer(modifier = Modifier.padding(8.dp))
+
+                    Row {
+                        Text(
+                            text = "You have spent ",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        Text(
+                            text = "Rs. 0",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        Text(
+                            text = "this month",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+
+                    }
+
                 }
 
             }
@@ -141,7 +156,6 @@ fun HomeScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        //.fillMaxHeight(0.4f)
                         .weight(2f)
                 ) {
                     SpendingProgressBar(
