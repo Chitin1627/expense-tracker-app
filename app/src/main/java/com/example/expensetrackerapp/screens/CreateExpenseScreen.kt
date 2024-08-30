@@ -123,7 +123,7 @@ fun CreateExpenseScreen(
                     .padding(top = 4.dp)
                     .clip(RoundedCornerShape(16.dp))
             ) {
-                categoryNameMap.keys.forEach { categoryItem ->
+                categoryNameMap.keys.sorted().forEach { categoryItem ->
                     DropdownMenuItem(
                         text = { Text(text = categoryItem) },
                         onClick = {

@@ -121,7 +121,7 @@ fun HomeScreen(
                             style = MaterialTheme.typography.titleSmall
                         )
                         Text(
-                            text = "Rs. 0",
+                            text = "Rs. 0 ",
                             color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.titleSmall
                         )
