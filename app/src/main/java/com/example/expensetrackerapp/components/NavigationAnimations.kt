@@ -8,8 +8,8 @@ fun defaultEnterTransition(): (AnimatedContentTransitionScope<NavBackStackEntry>
     return {
         slideInHorizontally(
             initialOffsetX = { 1000 },
-            animationSpec = tween(durationMillis = 700)
-        ) + fadeIn(animationSpec = tween(durationMillis = 700))
+            animationSpec = tween(durationMillis = 1000)
+        ) + fadeIn(animationSpec = tween(durationMillis = 1000))
     }
 }
 
@@ -17,7 +17,7 @@ fun defaultExitTransition(): (AnimatedContentTransitionScope<NavBackStackEntry>.
     return {
         slideOutHorizontally(
             targetOffsetX = { -1000 },
-            animationSpec = tween(durationMillis = 700)
-        ) + fadeOut(animationSpec = tween(durationMillis = 700))
+            animationSpec = tween(durationMillis = 1000)
+        ) + fadeOut(animationSpec = tween(durationMillis = 1000))
     }
 }

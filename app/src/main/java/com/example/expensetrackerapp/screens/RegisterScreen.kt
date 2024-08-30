@@ -163,7 +163,8 @@ fun RegisterScreen(
         if (isLoading) {
             CircularProgressIndicator(
                 color = MaterialTheme.colorScheme.primary,
-                strokeWidth = 2.dp
+                strokeWidth = 2.dp,
+                modifier = Modifier.padding(top = 8.dp)
             )
         } else {
             Column(
