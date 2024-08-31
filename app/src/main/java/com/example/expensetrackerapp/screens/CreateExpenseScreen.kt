@@ -29,11 +29,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.expensetrackerapp.components.AutoResizedText
 import com.example.expensetrackerapp.components.DateSelectorButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -73,8 +75,8 @@ fun CreateExpenseScreen(
         verticalArrangement = Arrangement.Center
     ) {
         
-        Text(
-            text = "Don't put any personal information",
+        AutoResizedText(
+            text = AnnotatedString("Don't put any personal information"),
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,

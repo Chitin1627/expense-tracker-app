@@ -41,9 +41,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.example.expensetrackerapp.components.AutoResizedText
 import com.example.expensetrackerapp.components.DateSelectorButton
 import com.example.expensetrackerapp.components.MonthlyLimitDialog
 import com.example.expensetrackerapp.components.SpendingProgressBar
@@ -76,25 +81,21 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
-            Text(
-                text = "Hello ",
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 8.dp)
-            )
-            Text(
-                text = "${getUsername(context)?.replaceFirstChar(Char::titlecase)}!",
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.headlineMedium,
-            )
-        }
+        AutoResizedText(
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+                    append("Hello ")
+                }
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+                    append("${getUsername(context)?.replaceFirstChar(Char::titlecase)}!")
+                }
+            },
+            modifier = Modifier.padding(16.dp),
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.headlineMedium,
+        )
+
         Box(modifier = Modifier
             .fillMaxSize()
             .weight(5f),
@@ -107,34 +108,29 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(
-                        text = "Guess you are saving a lot ;)",
+                    AutoResizedText(
+                        text = AnnotatedString("Guess you are saving a lot ;)"),
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.padding(8.dp))
+                    AutoResizedText(
+                        text = buildAnnotatedString {
+                            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+                                append("You have spent ")
+                            }
+                            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+                                append("Rs. 0 ")
+                            }
+                            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+                                append("this month")
+                            }
 
-                    Row {
-                        Text(
-                            text = "You have spent ",
-                            color = MaterialTheme.colorScheme.onBackground,
-                            style = MaterialTheme.typography.titleSmall
-                        )
-                        Text(
-                            text = "Rs. 0 ",
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.titleSmall
-                        )
-                        Text(
-                            text = "this month",
-                            color = MaterialTheme.colorScheme.onBackground,
-                            style = MaterialTheme.typography.titleSmall
-                        )
-
-                    }
-
+                        },
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.titleSmall
+                    )
                 }
-
             }
             else {
                 PieChartScreen(pieChartData = expenseByCategory)
