@@ -62,6 +62,7 @@ fun HomeScreen(
     expenseByCategory: List<CategoryExpense>,
     monthlyLimit: Double,
     currentMonthExpense: Double,
+    netExpense: Double,
     onSetLimit: (Double) -> Unit,
     onDateSelected: (String) -> Unit,
 ) {
@@ -120,7 +121,7 @@ fun HomeScreen(
                                 append("You have spent ")
                             }
                             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                                append("Rs. 0 ")
+                                append("${Char(8377)}0 ")
                             }
                             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
                                 append("this month")
@@ -155,7 +156,7 @@ fun HomeScreen(
                         .weight(2f)
                 ) {
                     SpendingProgressBar(
-                        totalSpent = currentMonthExpense,
+                        totalSpent = netExpense,
                         monthlyLimit = monthlyExpenseLimit,
                         modifier = Modifier
                             .fillMaxWidth()

@@ -33,26 +33,25 @@ fun ExpenseByDateScreen(
     val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
 
     var expandedCardId by remember { mutableStateOf<String?>(null) }
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(
+            text = outputFormat.format(inputFormat.parse(date) ?: ""),
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(start = 24.dp)
+        )
 
-    if(expenses.isNotEmpty()) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text(
-                text = outputFormat.format(inputFormat.parse(date)?:""),
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 24.dp)
-            )
+        Text(
+            text = "Click on an expense to see the description",
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(start = 24.dp)
+        )
 
-            Text(
-                text = "Click a card see the description",
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(start = 24.dp)
-            )
-
+        if (expenses.isNotEmpty()) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -67,9 +66,10 @@ fun ExpenseByDateScreen(
                             category = category,
                             isExpanded = expandedCardId == expense._id,
                             onCardClick = { expenseId ->
-                                expandedCardId = if (expandedCardId == expenseId) null else expenseId
+                                expandedCardId =
+                                    if (expandedCardId == expenseId) null else expenseId
                             },
-                            onDeleteClick = {expenseId ->
+                            onDeleteClick = { expenseId ->
                                 onExpenseDelete(expenseId)
                             }
                         )
@@ -77,18 +77,18 @@ fun ExpenseByDateScreen(
                 }
             }
         }
-    }
-    else {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Nothing to see here :(",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
+        else {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Nothing to see here :(",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 

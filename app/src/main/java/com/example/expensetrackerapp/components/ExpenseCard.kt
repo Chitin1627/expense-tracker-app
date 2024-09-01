@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.expensetrackerapp.model.Expense
+import com.example.expensetrackerapp.ui.theme.Teal
 
 @Composable
 fun ExpenseCard(
@@ -100,12 +101,23 @@ fun ExpenseCard(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "Rs.${expense.amount}",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.weight(1f),
-                            textAlign = TextAlign.Start
-                        )
+                        if(expense.type=="DEBIT") {
+                            Text(
+                                text = "${Char(8377)}${expense.amount}",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.weight(1f),
+                                textAlign = TextAlign.Start
+                            )
+                        }
+                        else {
+                            Text(
+                                text = "+ ${Char(8377)}${expense.amount}",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.weight(1f),
+                                textAlign = TextAlign.Start,
+                                color = if(!isExpanded) Color(0xFF059212) else MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
                         IconButton(
                             onClick = {
                                 showDialog = true

@@ -47,6 +47,7 @@ fun HomeScreenHelper(
             expenseByCategory = homeScreenViewModel.getListOfExpenseByCategory(),
             monthlyLimit = homeScreenViewModel.getSpendingLimit(),
             currentMonthExpense = homeScreenViewModel.getCurrentMonthExpense(),
+            netExpense = homeScreenViewModel.getNetExpense(),
             onSetLimit = { limit ->
                 CoroutineScope(Dispatchers.IO).launch {
                     homeScreenViewModel.setSpendingLimitFromApi(limit, context)

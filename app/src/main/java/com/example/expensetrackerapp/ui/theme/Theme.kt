@@ -25,7 +25,7 @@ private val DarkColorScheme = darkColorScheme(
     onPrimary = DarkOnPrimary,
     onSecondary = DarkOnSecondary,
     onBackground = DarkOnBackground,
-    onSurface = DarkOnSurface
+    onSurface = DarkOnSurface,
 )
 
 @Composable

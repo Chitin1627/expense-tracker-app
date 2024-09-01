@@ -138,6 +138,7 @@ class HomeScreenViewModel : ViewModel() {
     fun getSpendingLimit(): Double {
         return uiState.value.monthlyLimit
     }
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun calculateExpenseByCategory(expenses: List<Expense>) : HashMap<String, Double>{
         val expenseByCategory = HashMap<String, Double>()
@@ -148,20 +149,23 @@ class HomeScreenViewModel : ViewModel() {
             expenseByCategory[name] = 0.0
         }
         expenses.forEach { expense ->
-            val date = LocalDate.parse(expense.date, DateTimeFormatter.ISO_DATE_TIME)
-            if(date.month==currMonth && date.year==currYear) {
-                val category = categories[expense.category_id]
-                if(expenseByCategory.containsKey(category)) {
-                    if (category != null) {
-                        expenseByCategory[category] = (expenseByCategory[category]?: 0.0) + expense.amount
+            if(expense.type=="DEBIT") {
+                val date = LocalDate.parse(expense.date, DateTimeFormatter.ISO_DATE_TIME)
+                if(date.month==currMonth && date.year==currYear) {
+                    val category = categories[expense.category_id]
+                    if(expenseByCategory.containsKey(category)) {
+                        if (category != null) {
+                            expenseByCategory[category] = (expenseByCategory[category]?: 0.0) + expense.amount
+                        }
                     }
-                }
-                else {
-                    if (category != null) {
-                        expenseByCategory[category] = expense.amount
+                    else {
+                        if (category != null) {
+                            expenseByCategory[category] = expense.amount
+                        }
                     }
                 }
             }
+
         }
         _uiState.update { currentState->
             currentState.copy(
@@ -198,21 +202,33 @@ class HomeScreenViewModel : ViewModel() {
         val currMonth = LocalDate.now().month
         val currYear = LocalDate.now().year
         var currentMonthExpense = 0.0
+        var netExpense = 0.0
         expenses.forEach { expense ->
             val date = LocalDate.parse(expense.date, DateTimeFormatter.ISO_DATE_TIME)
             if(date.month==currMonth && date.year==currYear) {
-                currentMonthExpense+=expense.amount
+                if(expense.type=="DEBIT") {
+                    currentMonthExpense+=expense.amount
+                    netExpense+=expense.amount
+                }
+                else {
+                    netExpense-=expense.amount
+                }
             }
         }
         _uiState.update { currentState ->
             currentState.copy(
-                currentMonthExpense = currentMonthExpense
+                currentMonthExpense = currentMonthExpense,
+                netExpense = netExpense
             )
         }
     }
 
     fun getCurrentMonthExpense(): Double {
         return uiState.value.currentMonthExpense
+    }
+
+    fun getNetExpense(): Double {
+        return uiState.value.netExpense
     }
 
 //    @RequiresApi(Build.VERSION_CODES.O)

@@ -18,11 +18,12 @@ fun CreateExpenseScreenHelper(
 ) {
     val addExpenseViewModel: AddExpenseViewModel = viewModel()
     CreateExpenseScreen(
-        onSave = { amount, category, description, date ->
+        onSave = { amount, category, type, description, date ->
             addExpenseViewModel.setAmount(amount)
             addExpenseViewModel.setCategory(category)
             addExpenseViewModel.setDescription(description)
             addExpenseViewModel.setDate(date)
+            addExpenseViewModel.setType(type)
             try {
                 val success = addExpenseViewModel.createExpense(context)
                 if(success) homeScreenViewModel.setIsDataLoaded(false)

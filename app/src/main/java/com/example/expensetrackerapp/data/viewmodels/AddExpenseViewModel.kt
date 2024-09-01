@@ -65,18 +65,31 @@ class AddExpenseViewModel: ViewModel() {
         return uiState.value.date
     }
 
+    fun setType(type: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                type = type
+            )
+        }
+    }
+
+    fun getType(): String {
+        return uiState.value.type
+    }
+
     suspend fun createExpense(context: Context): Boolean = withContext(Dispatchers.IO) {
         val amount = getAmount()
         val category = getCategory()
+        val type = getType()
         val description = getDescription()
         val date = getDate()
         try {
             val retrofitClient = RetrofitClient(context)
             val api = retrofitClient.expenseApi
             val expense = ExpenseRequest(
-                username = getUsername(context) ?: "",
                 amount = amount,
                 category_id = category,
+                type = type,
                 description = description,
                 date = date
             )

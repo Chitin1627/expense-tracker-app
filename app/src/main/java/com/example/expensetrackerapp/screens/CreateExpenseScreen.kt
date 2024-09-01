@@ -47,7 +47,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateExpenseScreen(
-    onSave: suspend (amount: Double, category: String, description: String, date: String) -> Boolean,
+    onSave: suspend (amount: Double, category: String, type: String, description: String, date: String) -> Boolean,
     onDismiss: () -> Unit,
     categoryNameMap: HashMap<String, String>
 ) {
@@ -59,13 +59,15 @@ fun CreateExpenseScreen(
     var amount by rememberSaveable { mutableStateOf("") }
     var description by rememberSaveable { mutableStateOf("") }
     var category by rememberSaveable { mutableStateOf("") }
+    var type by rememberSaveable { mutableStateOf("") }
     var selectedDate by rememberSaveable { mutableStateOf(date) }
-    var expanded by rememberSaveable { mutableStateOf(false) }
+    var expandedCategory by rememberSaveable { mutableStateOf(false) }
+    var expandedType by rememberSaveable { mutableStateOf(false) }
     var saveButtonEnabled by rememberSaveable { mutableStateOf(false) }
     var isLoading by rememberSaveable { mutableStateOf(false) }
     var errorMessage by rememberSaveable { mutableStateOf<String?>(null) }
 
-    saveButtonEnabled = (amount != "" && !amount.contains("-") && categoryNameMap[category] != null)
+    saveButtonEnabled = (((amount != "") && !amount.contains("-") && (categoryNameMap[category] != null) && (type != "")))
 
     Column(
         modifier = Modifier
@@ -101,9 +103,9 @@ fun CreateExpenseScreen(
         Spacer(modifier = Modifier.padding(8.dp))
 
         ExposedDropdownMenuBox(
-            expanded = expanded,
+            expanded = expandedCategory,
             onExpandedChange = {
-                expanded = !expanded
+                expandedCategory = !expandedCategory
             }
         ) {
             OutlinedTextField(
@@ -119,8 +121,8 @@ fun CreateExpenseScreen(
                     .menuAnchor()
             )
             ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
+                expanded = expandedCategory,
+                onDismissRequest = { expandedCategory = false },
                 modifier = Modifier
                     .padding(top = 4.dp)
                     .clip(RoundedCornerShape(16.dp))
@@ -130,10 +132,55 @@ fun CreateExpenseScreen(
                         text = { Text(text = categoryItem) },
                         onClick = {
                             category = categoryItem
-                            expanded = false
+                            expandedCategory = false
                         }
                     )
                 }
+            }
+        }
+
+        Spacer(modifier = Modifier.padding(8.dp))
+
+        ExposedDropdownMenuBox(
+            expanded = expandedType,
+            onExpandedChange = {
+                expandedType = !expandedType
+            }
+        ) {
+            OutlinedTextField(
+                value = type,
+                label = { Text(text = "Type") },
+                shape = RoundedCornerShape(16.dp),
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Next
+                ),
+                onValueChange = {},
+                readOnly = true,
+                modifier = Modifier
+                    .menuAnchor()
+            )
+            ExposedDropdownMenu(
+                expanded = expandedType,
+                onDismissRequest = { expandedType = false },
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .clip(RoundedCornerShape(16.dp))
+            ) {
+                DropdownMenuItem(
+                    text = { Text(text = "DEBIT") },
+                    onClick = {
+                        type = "DEBIT"
+                        expandedType = false
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(text = "CREDIT") },
+                    onClick = {
+                        type = "CREDIT"
+                        expandedType = false
+                    }
+                )
             }
         }
 
@@ -193,6 +240,7 @@ fun CreateExpenseScreen(
                             val success = onSave(
                                 amount.toDouble(),
                                 categoryNameMap[category] ?: "",
+                                type,
                                 description,
                                 selectedDate
                             )
@@ -235,6 +283,7 @@ fun CreateExpenseScreen(
             amount = ""
             description = ""
             category = ""
+            type = ""
             selectedDate = date
         }
     }

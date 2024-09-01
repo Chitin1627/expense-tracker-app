@@ -15,7 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -29,8 +32,15 @@ fun SpendingProgressBar(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = "Rs.$totalSpent / $monthlyLimit",
+        AutoResizedText(
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+                    append("Net Expense: ")
+                }
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+                    append("${Char(8377)}${totalSpent} / ${monthlyLimit}")
+                }
+            },
             color = if(progress<1f) MaterialTheme.colorScheme.primary else Color.Red,
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
