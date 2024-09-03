@@ -1,5 +1,6 @@
 package com.example.expensetrackerapp.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,21 +19,32 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.expensetrackerapp.data.viewmodels.AddExpenseViewModel
+import com.example.expensetrackerapp.data.viewmodels.HomeScreenViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun ExpenseByDateScreen(
     date: String,
-    expenses: List<Expense>,
+    expenses: ArrayList<Expense>,
+    homeScreenViewModel: HomeScreenViewModel,
     categories: HashMap<String, String>,
     onExpenseDelete: (String) -> Unit
 ) {
+    val context = LocalContext.current
+
     val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+    val addExpenseViewModel: AddExpenseViewModel = viewModel()
 
+    val deletedExpense by remember { mutableStateOf(HashMap<String, Boolean>()) }
     var expandedCardId by remember { mutableStateOf<String?>(null) }
+    var editingCardId by remember { mutableStateOf<String?>(null) }
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -59,20 +71,61 @@ fun ExpenseByDateScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(expenses) { expense ->
-                    val category = categories[expense.category_id]
-                    if (category != null) {
-                        ExpenseCard(
-                            expense = expense,
-                            category = category,
-                            isExpanded = expandedCardId == expense._id,
-                            onCardClick = { expenseId ->
-                                expandedCardId =
-                                    if (expandedCardId == expenseId) null else expenseId
-                            },
-                            onDeleteClick = { expenseId ->
-                                onExpenseDelete(expenseId)
-                            }
-                        )
+                    if(!deletedExpense.containsKey(expense._id)) {
+                        val category = categories[expense.category_id]
+                        if (category != null) {
+                            ExpenseCard(
+                                expense = expense,
+                                category = category,
+                                isExpanded = expandedCardId == expense._id,
+                                isEditing = editingCardId == expense._id,
+                                isClickable = editingCardId==null,
+                                onEditClick = {expenseId ->
+                                    editingCardId = expenseId
+                                },
+                                onCancelClick = {
+                                    editingCardId = null
+                                },
+                                onCardClick = { expenseId ->
+                                    expandedCardId =
+                                        if (expandedCardId == expenseId) null else expenseId
+                                },
+                                onDeleteClick = { expenseId ->
+                                    onExpenseDelete(expenseId)
+                                    deletedExpense[expenseId] = true
+                                },
+                                onSave = { expenseId, amount, categoryId, type, description, date, created_at ->
+                                    addExpenseViewModel.setExpenseId(expenseId)
+                                    addExpenseViewModel.setAmount(amount)
+                                    addExpenseViewModel.setCategory(categoryId)
+                                    addExpenseViewModel.setDescription(description)
+                                    addExpenseViewModel.setDate(date)
+                                    addExpenseViewModel.setType(type)
+                                    addExpenseViewModel.setCreatedAt(created_at)
+                                    try {
+                                        val success = addExpenseViewModel.editExpense(context)
+                                        if (success) {
+                                            val index = expenses.indexOfFirst { it._id == expenseId }
+                                            if (index != -1) {
+                                                expenses[index] = expenses[index].copy(
+                                                    amount = amount,
+                                                    category_id = categoryId,
+                                                    type = type,
+                                                    description = description,
+                                                    date = date,
+                                                    created_at = created_at
+                                                )
+                                            }
+                                            homeScreenViewModel.setIsDataLoaded(false)
+                                        }
+                                        success
+                                    } catch (e: Exception) {
+                                        false
+                                    }
+                                },
+                                categoryNameMap = homeScreenViewModel.getCategoriesNameMap()
+                            )
+                        }
                     }
                 }
             }
@@ -91,5 +144,4 @@ fun ExpenseByDateScreen(
             }
         }
     }
-
 }

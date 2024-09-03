@@ -252,7 +252,7 @@ class HomeScreenViewModel : ViewModel() {
 //        }
 //    }
 
-    suspend fun getExpensesByDateFromApi(context: Context, date: String): List<Expense> {
+    suspend fun getExpensesByDateFromApi(context: Context, date: String): ArrayList<Expense> {
         val retrofitClient = RetrofitClient(context)
         val api = retrofitClient.expenseApi
         return withContext(Dispatchers.IO) {
@@ -260,7 +260,7 @@ class HomeScreenViewModel : ViewModel() {
                 val response = api.getUserExpenseByDate(date)
                 response
             } catch(e: Exception) {
-                emptyList()
+                ArrayList<Expense>()
             }
         }
     }

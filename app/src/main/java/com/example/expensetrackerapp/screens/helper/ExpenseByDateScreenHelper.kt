@@ -1,5 +1,6 @@
 package com.example.expensetrackerapp.screens.helper
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.exp
 
+@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun ExpenseByDateScreenHelper(
     navController: NavHostController,
@@ -25,7 +27,7 @@ fun ExpenseByDateScreenHelper(
     context: Context
 ) {
     var isLoading by remember { mutableStateOf(true) }
-    var expenseByDate by remember { mutableStateOf(emptyList<Expense>()) }
+    var expenseByDate by remember { mutableStateOf(ArrayList<Expense>()) }
     LaunchedEffect(Unit) {
         val date = homeScreenViewModel.getSelectedDate()
         println(date)
@@ -40,6 +42,7 @@ fun ExpenseByDateScreenHelper(
         ExpenseByDateScreen(
             date = homeScreenViewModel.getSelectedDate(),
             expenses = expenseByDate,
+            homeScreenViewModel = homeScreenViewModel,
             categories = homeScreenViewModel.getCategories(),
             onExpenseDelete = {expenseId ->
                 CoroutineScope(Dispatchers.IO).launch {

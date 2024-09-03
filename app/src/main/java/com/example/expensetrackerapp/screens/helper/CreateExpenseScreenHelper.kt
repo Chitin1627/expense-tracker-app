@@ -18,7 +18,8 @@ fun CreateExpenseScreenHelper(
 ) {
     val addExpenseViewModel: AddExpenseViewModel = viewModel()
     CreateExpenseScreen(
-        onSave = { amount, category, type, description, date ->
+        onSave = { expenseId, amount, category, type, description, date, created_at ->
+            addExpenseViewModel.setExpenseId(expenseId)
             addExpenseViewModel.setAmount(amount)
             addExpenseViewModel.setCategory(category)
             addExpenseViewModel.setDescription(description)

@@ -36,6 +36,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.expensetrackerapp.components.AutoResizedText
+import com.example.expensetrackerapp.components.CreateExpenseComponent
 import com.example.expensetrackerapp.components.DateSelectorButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,28 +48,10 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateExpenseScreen(
-    onSave: suspend (amount: Double, category: String, type: String, description: String, date: String) -> Boolean,
+    onSave: suspend (expenseId: String, amount: Double, category: String, type: String, description: String, date: String, created_at: String) -> Boolean,
     onDismiss: () -> Unit,
     categoryNameMap: HashMap<String, String>
 ) {
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    val date = dateFormat.format(Date())
-    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-
-    var amount by rememberSaveable { mutableStateOf("") }
-    var description by rememberSaveable { mutableStateOf("") }
-    var category by rememberSaveable { mutableStateOf("") }
-    var type by rememberSaveable { mutableStateOf("") }
-    var selectedDate by rememberSaveable { mutableStateOf(date) }
-    var expandedCategory by rememberSaveable { mutableStateOf(false) }
-    var expandedType by rememberSaveable { mutableStateOf(false) }
-    var saveButtonEnabled by rememberSaveable { mutableStateOf(false) }
-    var isLoading by rememberSaveable { mutableStateOf(false) }
-    var errorMessage by rememberSaveable { mutableStateOf<String?>(null) }
-
-    saveButtonEnabled = (((amount != "") && !amount.contains("-") && (categoryNameMap[category] != null) && (type != "")))
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,215 +59,10 @@ fun CreateExpenseScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        
-        AutoResizedText(
-            text = AnnotatedString("Don't put any personal information"),
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+        CreateExpenseComponent(
+            onSave = onSave,
+            onDismiss = onDismiss,
+            categoryNameMap = categoryNameMap
         )
-
-        Spacer(modifier = Modifier.padding(8.dp))
-
-        OutlinedTextField(
-            value = amount,
-            label = { Text(text = "Amount") },
-            shape = RoundedCornerShape(16.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Decimal
-            ),
-            onValueChange = {
-                amount = it
-            }
-        )
-
-        Spacer(modifier = Modifier.padding(8.dp))
-
-        ExposedDropdownMenuBox(
-            expanded = expandedCategory,
-            onExpandedChange = {
-                expandedCategory = !expandedCategory
-            }
-        ) {
-            OutlinedTextField(
-                value = category,
-                label = { Text(text = "Category") },
-                shape = RoundedCornerShape(16.dp),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Next
-                ),
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier
-                    .menuAnchor()
-            )
-            ExposedDropdownMenu(
-                expanded = expandedCategory,
-                onDismissRequest = { expandedCategory = false },
-                modifier = Modifier
-                    .padding(top = 4.dp)
-                    .clip(RoundedCornerShape(16.dp))
-            ) {
-                categoryNameMap.keys.sorted().forEach { categoryItem ->
-                    DropdownMenuItem(
-                        text = { Text(text = categoryItem) },
-                        onClick = {
-                            category = categoryItem
-                            expandedCategory = false
-                        }
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.padding(8.dp))
-
-        ExposedDropdownMenuBox(
-            expanded = expandedType,
-            onExpandedChange = {
-                expandedType = !expandedType
-            }
-        ) {
-            OutlinedTextField(
-                value = type,
-                label = { Text(text = "Type") },
-                shape = RoundedCornerShape(16.dp),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Next
-                ),
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier
-                    .menuAnchor()
-            )
-            ExposedDropdownMenu(
-                expanded = expandedType,
-                onDismissRequest = { expandedType = false },
-                modifier = Modifier
-                    .padding(top = 4.dp)
-                    .clip(RoundedCornerShape(16.dp))
-            ) {
-                DropdownMenuItem(
-                    text = { Text(text = "DEBIT") },
-                    onClick = {
-                        type = "DEBIT"
-                        expandedType = false
-                    }
-                )
-
-                DropdownMenuItem(
-                    text = { Text(text = "CREDIT") },
-                    onClick = {
-                        type = "CREDIT"
-                        expandedType = false
-                    }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.padding(8.dp))
-
-        OutlinedTextField(
-            value = description,
-            label = { Text(text = "Description") },
-            shape = RoundedCornerShape(16.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done
-            ),
-            onValueChange = {
-                description = it
-            }
-        )
-
-        Spacer(modifier = Modifier.padding(8.dp))
-
-        DateSelectorButton(
-            onDateSelected = { date ->
-                selectedDate = date
-            },
-            text = "Select Date"
-        )
-        Spacer(modifier = Modifier.padding(8.dp))
-
-        Text(
-            text = "Selected Date: ${inputFormat.parse(selectedDate)
-            ?.let { outputFormat.format(it) }}",
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.padding(8.dp))
-
-        if (errorMessage != null) {
-            Text(
-                text = errorMessage!!,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(8.dp)
-            )
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            if (!isLoading) {
-                Button(
-                    enabled = saveButtonEnabled,
-                    onClick = {
-                        isLoading = true
-                        CoroutineScope(Dispatchers.Main).launch {
-                            val success = onSave(
-                                amount.toDouble(),
-                                categoryNameMap[category] ?: "",
-                                type,
-                                description,
-                                selectedDate
-                            )
-                            isLoading = false
-                            if (success) {
-                                onDismiss()
-                            }
-                            else {
-                                errorMessage = "Failed to save expense. Please try again"
-                            }
-                        }
-                    },
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .wrapContentSize(Alignment.Center) // Wraps content size around its content
-                ) {
-                    Text(text = "Save")
-                }
-
-                Spacer(modifier = Modifier.padding(4.dp))
-
-                Button(
-                    onClick = {
-                        onDismiss()
-                    }
-                ) {
-                    Text(text = "Cancel")
-                }
-            } else {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.primary,
-                    strokeWidth = 2.dp
-                )
-            }
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            amount = ""
-            description = ""
-            category = ""
-            type = ""
-            selectedDate = date
-        }
     }
 }

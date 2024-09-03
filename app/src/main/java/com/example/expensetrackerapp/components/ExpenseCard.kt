@@ -11,6 +11,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,16 +23,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -51,12 +55,18 @@ fun ExpenseCard(
     expense: Expense,
     category: String,
     isExpanded: Boolean,
+    isEditing: Boolean,
+    isClickable: Boolean,
+    onEditClick: (String) -> Unit,
+    onCancelClick: () -> Unit,
     onCardClick: (String) -> Unit,
-    onDeleteClick: (String) -> Unit
+    onDeleteClick: (String) -> Unit,
+    onSave: suspend (expenseId: String, amount: Double, category: String, type: String, description: String, date: String, created_at: String) -> Boolean,
+    categoryNameMap: HashMap<String, String>
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var isVisible by remember { mutableStateOf(true) }
-
+    //var isEditing by remember { mutableStateOf(false) }
 
     AnimatedVisibility(
         visible = isVisible,
@@ -74,17 +84,16 @@ fun ExpenseCard(
                     shape = RoundedCornerShape(8.dp)
                 )
         ) {
-
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
                 elevation = CardDefaults.cardElevation(4.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = if(!isExpanded) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary
+                    containerColor = if(!isExpanded || isEditing) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary
                 ),
                 border = BorderStroke(2.dp, color = MaterialTheme.colorScheme.primary),
-                onClick = {onCardClick(expense._id)}
+                onClick = { if(!isEditing) onCardClick(expense._id) }
             ) {
                 Column(
                     modifier = Modifier
@@ -97,65 +106,94 @@ fun ExpenseCard(
                             )
                         )
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if(expense.type=="DEBIT") {
-                            Text(
-                                text = "${Char(8377)}${expense.amount}",
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.weight(1f),
-                                textAlign = TextAlign.Start
-                            )
-                        }
-                        else {
-                            Text(
-                                text = "+ ${Char(8377)}${expense.amount}",
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.weight(1f),
-                                textAlign = TextAlign.Start,
-                                color = if(!isExpanded) Color(0xFF059212) else MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                        IconButton(
-                            onClick = {
-                                showDialog = true
-                            }
+                    if(isEditing) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
                         ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Delete,
-                                contentDescription = "Delete Expense",
-                                tint = if(!isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimary
+                            CreateExpenseComponent(
+                                onSave = onSave,
+                                onDismiss = onCancelClick,
+                                categoryNameMap = categoryNameMap,
+                                expenseId = expense._id,
+                                currentAmount = expense.amount.toString(),
+                                currentDescription = expense.description,
+                                currentCategory = category,
+                                currentDate = expense.date,
+                                currentType = expense.type
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = "Category: $category",
-                        style = MaterialTheme.typography.titleSmall,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Start
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    if(isExpanded) {
-                        if(expense.description!="") {
-                            Text(
-                                text = expense.description,
-                                style = MaterialTheme.typography.titleSmall,
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Start
-                            )
+                    else {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if(expense.type=="DEBIT") {
+                                Text(
+                                    text = "${Char(8377)}${expense.amount}",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.weight(1f),
+                                    textAlign = TextAlign.Start
+                                )
+                            }
+                            else {
+                                Text(
+                                    text = "+ ${Char(8377)}${expense.amount}",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.weight(1f),
+                                    textAlign = TextAlign.Start,
+                                    color = if(!isExpanded) Color(0xFF059212) else MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
+                            if(isClickable) {
+                                IconButton(
+                                    onClick = { showDialog = true},
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Delete,
+                                        contentDescription = "Delete Expense",
+                                        tint = if(!isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
+                                IconButton(
+                                    onClick = { onEditClick(expense._id) },
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Edit,
+                                        contentDescription = "Edit Expense",
+                                        tint = if(!isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
+                            }
                         }
-                        else {
-                            Text(
-                                text = "No description provided",
-                                style = MaterialTheme.typography.titleSmall,
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Start
-                            )
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = "Category: $category",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Start
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        if(isExpanded) {
+                            if(expense.description!="") {
+                                Text(
+                                    text = expense.description,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Start
+                                )
+                            }
+                            else {
+                                Text(
+                                    text = "No description provided",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Start
+                                )
+                            }
                         }
                     }
                 }
