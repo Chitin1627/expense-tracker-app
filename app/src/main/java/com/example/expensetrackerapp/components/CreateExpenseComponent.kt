@@ -69,7 +69,14 @@ fun CreateExpenseComponent(
     var isLoading by rememberSaveable { mutableStateOf(false) }
     var errorMessage by rememberSaveable { mutableStateOf<String?>(null) }
 
-    saveButtonEnabled = (((amount != "") && !amount.contains("-") && (categoryNameMap[category] != null) && (type != "")))
+    saveButtonEnabled = ((
+            (amount != "") &&
+                    !amount.contains("-") &&
+                    !(amount.contains(" ")) &&
+                    (amount.toDouble() > 0.0) &&
+                    (categoryNameMap[category] != null) &&
+                    (type != "")
+            ))
 
     AutoResizedText(
         text = AnnotatedString("Don't put any personal information"),
