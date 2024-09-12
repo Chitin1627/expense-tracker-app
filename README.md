@@ -23,13 +23,16 @@ The app aims to offer a seamless way to record, view, and analyze personal expen
   4) **Networking:** Retrofit
   5) **Authentication:** JWT-based token authentication
 
-     <img src="https://github.com/user-attachments/assets/6213f73b-aec0-4b46-b765-bf76a8093b0b" alt="Login Screen" height="1100" width="500">
+## Screenshots
+
+
+  <img src="https://github.com/user-attachments/assets/6213f73b-aec0-4b46-b765-bf76a8093b0b" alt="Login Screen" height="1100" width="500">
+  
+  <img src="https://github.com/user-attachments/assets/9e4b5752-3670-4bd1-bca7-4faa3cc2e499" alt="Add Expense Screen" height="1100" width="500">
      
-     <img src="https://github.com/user-attachments/assets/9e4b5752-3670-4bd1-bca7-4faa3cc2e499" alt="Add Expense Screen" height="1100" width="500">
+  <img src="https://github.com/user-attachments/assets/91d3c291-a330-47d0-a1df-8e1281f1050c" alt="Add Expense Screen" height="1100" width="500">
      
-     <img src="https://github.com/user-attachments/assets/91d3c291-a330-47d0-a1df-8e1281f1050c" alt="Add Expense Screen" height="1100" width="500">
+  <img src="https://github.com/user-attachments/assets/a75574ac-052d-4d2e-b0cf-c2ff20dd2efa" alt="Expense By Date Screen" height="1100" width="500">
      
-     <img src="https://github.com/user-attachments/assets/a75574ac-052d-4d2e-b0cf-c2ff20dd2efa" alt="Expense By Date Screen" height="1100" width="500">
-     
-     <img src="https://github.com/user-attachments/assets/34959ae7-e334-4c47-9e55-81755e10b3f3" alt="Expense By Date Screen" height="1100" width="500">
+  <img src="https://github.com/user-attachments/assets/34959ae7-e334-4c47-9e55-81755e10b3f3" alt="Expense By Date Screen" height="1100" width="500">
 
