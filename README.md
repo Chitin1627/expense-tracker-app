@@ -18,7 +18,7 @@ The app aims to offer a seamless way to record, view, and analyze personal expen
 
 ## **Tech Stack:**
   1) **Frontend:** Kotlin, Jetpack Compose
-  2) **Backend:** Spring Boot
+  2) **Backend:** Spring Boot [[Backend code](https://github.com/Chitin1627/expense-tracker-backend)]
   3) **Database:** MongoDB
   4) **Networking:** Retrofit
   5) **Authentication:** JWT-based token authentication
