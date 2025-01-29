@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.example.expensetrackerapp.components.LoadingAnimation
 import com.example.expensetrackerapp.data.getToken
 import com.example.expensetrackerapp.data.removeToken
 import kotlinx.coroutines.delay
@@ -35,6 +36,6 @@ fun MainScreen(
     when (isTokenValid) {
         true -> goToHome()
         false -> goToLogin()
-        null -> LoadingScreen()
+        null -> LoadingAnimation()
     }
 }

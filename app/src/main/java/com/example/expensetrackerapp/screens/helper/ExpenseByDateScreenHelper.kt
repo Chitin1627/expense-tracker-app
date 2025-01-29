@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.expensetrackerapp.components.LoadingAnimation
 import com.example.expensetrackerapp.data.viewmodels.HomeScreenViewModel
 import com.example.expensetrackerapp.model.Expense
 import com.example.expensetrackerapp.screens.ExpenseByDateScreen
@@ -36,7 +37,7 @@ fun ExpenseByDateScreenHelper(
     }
 
     if(isLoading) {
-        LoadingScreen()
+        LoadingAnimation()
     }
     else {
         ExpenseByDateScreen(

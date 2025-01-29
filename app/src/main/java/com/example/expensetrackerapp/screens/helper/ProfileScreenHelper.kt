@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.expensetrackerapp.components.LoadingAnimation
 import com.example.expensetrackerapp.components.appbar.AppScreen
 import com.example.expensetrackerapp.data.removeToken
 import com.example.expensetrackerapp.data.removeUsername
@@ -38,7 +39,7 @@ fun ProfileScreenHelper(
     }
 
     if(isLoading) {
-        LoadingScreen()
+        LoadingAnimation()
     }
     else {
         ProfileScreen(
