@@ -23,6 +23,7 @@ import com.example.expensetrackerapp.data.viewmodels.AddExpenseViewModel
 import com.example.expensetrackerapp.data.viewmodels.AuthenticationViewModel
 import com.example.expensetrackerapp.data.viewmodels.HomeScreenViewModel
 import com.example.expensetrackerapp.screens.MainScreen
+import com.example.expensetrackerapp.screens.helper.AIAnalysisScreenHelper
 import com.example.expensetrackerapp.screens.helper.CreateExpenseScreenHelper
 import com.example.expensetrackerapp.screens.helper.ExpenseByDateScreenHelper
 import com.example.expensetrackerapp.screens.helper.HomeScreenHelper
@@ -36,9 +37,7 @@ import com.example.expensetrackerapp.screens.helper.RegisterScreenHelper
 fun ExpenseTrackerApp(
     navController: NavHostController = rememberNavController()
 ) {
-    //val appUiState by appViewModel.uiState.collectAsState()
     val homeScreenViewModel: HomeScreenViewModel = viewModel()
-    val authenticationViewModel: AuthenticationViewModel = viewModel()
     val context = LocalContext.current
     //removeToken(context)
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -151,6 +150,20 @@ fun ExpenseTrackerApp(
                 popExitTransition = defaultExitTransition()
             ) {
                 RegisterScreenHelper(navController = navController, context = context)
+            }
+
+            composable(
+                AppScreen.AIAnalyse.route,
+                enterTransition = defaultEnterTransition(),
+                exitTransition = defaultExitTransition(),
+                popEnterTransition = defaultEnterTransition(),
+                popExitTransition = defaultExitTransition()
+            ) {
+                AIAnalysisScreenHelper(
+                    navController = navController,
+                    homeScreenViewModel = homeScreenViewModel,
+                    context = context
+                )
             }
         }
     }

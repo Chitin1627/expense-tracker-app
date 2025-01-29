@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class AppScreen(
@@ -30,7 +31,7 @@ sealed class AppScreen(
 
     object AddExpense:
             AppScreen(
-                "Add Expense",
+                "Add",
                 Icons.Outlined.AddCircle,
                 "add Expense"
             )
@@ -76,4 +77,11 @@ sealed class AppScreen(
                 Icons.Outlined.Check,
                 "Register"
             )
+
+    object AIAnalyse:
+        AppScreen(
+            "AI Analyse",
+            Icons.Outlined.Star,
+            "Analyze with AI"
+        )
 }

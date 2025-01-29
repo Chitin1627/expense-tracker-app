@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Color
 
 val items = listOf(
     AppScreen.Statistics,
+    AppScreen.AIAnalyse,
     AppScreen.Home,
     AppScreen.AddExpense,
     AppScreen.Profile

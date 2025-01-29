@@ -65,4 +65,8 @@ class RetrofitClient(context: Context) {
     val userApi: UserApi by lazy {
         retrofit.create(UserApi::class.java)
     }
+
+    val aiAnalyseApi: AIAnalyseApi by lazy {
+        retrofit.create(AIAnalyseApi::class.java)
+    }
 }
