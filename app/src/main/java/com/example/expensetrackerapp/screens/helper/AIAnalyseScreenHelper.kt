@@ -44,8 +44,10 @@ fun AIAnalysisScreenHelper(
     val aiAnalysisViewModel: AIAnalysisViewModel = viewModel()
     LaunchedEffect(Unit) {
         val resp = aiAnalysisViewModel.askAi(context)
-        if (resp) {
-            response = aiAnalysisViewModel.getResponse()
+        response = if (resp) {
+            aiAnalysisViewModel.getResponse()
+        } else {
+            "Something went wrong. Blame Gemini or Render, not me :)"
         }
         isLoading = false
     }
