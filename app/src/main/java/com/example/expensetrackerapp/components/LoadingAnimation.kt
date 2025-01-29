@@ -47,7 +47,7 @@ fun LoadingAnimation() {
     ) {
         Text(
             text = randomSentence + ".".repeat(dotCount),
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
         )
