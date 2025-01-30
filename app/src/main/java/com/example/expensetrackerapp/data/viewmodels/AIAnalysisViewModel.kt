@@ -37,6 +37,7 @@ class AIAnalysisViewModel: ViewModel() {
             val api = retrofitClient.aiAnalyseApi
             val response = api.getAIAnalysis()
             println(response.body())
+            if(response==null) false
             response.body()?.let { extractText(it.string()) }?.let { setResponse(it) }
             response.isSuccessful
         }
