@@ -25,6 +25,7 @@ import com.example.expensetrackerapp.data.viewmodels.HomeScreenViewModel
 import com.example.expensetrackerapp.screens.MainScreen
 import com.example.expensetrackerapp.screens.helper.AIAnalysisScreenHelper
 import com.example.expensetrackerapp.screens.helper.CreateExpenseScreenHelper
+import com.example.expensetrackerapp.screens.helper.DebtScreenHelper
 import com.example.expensetrackerapp.screens.helper.ExpenseByDateScreenHelper
 import com.example.expensetrackerapp.screens.helper.HomeScreenHelper
 import com.example.expensetrackerapp.screens.helper.LoginScreenHelper
@@ -41,14 +42,16 @@ fun ExpenseTrackerApp(
     val context = LocalContext.current
     //removeToken(context)
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    println(currentRoute)
     Scaffold(
         bottomBar = {
             if (currentRoute !in listOf(AppScreen.Login.route, AppScreen.Register.route, AppScreen.Loading.route, AppScreen.Validating.route, null)) {
                 BottomNavBar(
                     navigateTo = { route ->
                         navController.navigate(route) {
-                            popUpTo(AppScreen.Home.route) {
+                            popUpTo(0) {
                                 saveState = true
+                                inclusive = true
                             }
                             launchSingleTop = true
                             restoreState = true
@@ -62,7 +65,9 @@ fun ExpenseTrackerApp(
             if (currentRoute !in listOf(AppScreen.Login.route, AppScreen.Register.route, AppScreen.Loading.route, AppScreen.Validating.route, null)) {
                 if (currentRoute != null) {
                     MyTopAppBar(
-                        currentScreen = currentRoute.replaceFirstChar(Char::titlecase))
+                        currentScreen = currentRoute.replaceFirstChar(Char::titlecase),
+                        onProfileClick = { navController.navigate(AppScreen.Profile.route) }
+                    )
                 }
             }
         }
@@ -164,6 +169,12 @@ fun ExpenseTrackerApp(
                     homeScreenViewModel = homeScreenViewModel,
                     context = context
                 )
+            }
+
+            composable(
+                AppScreen.Debts.route
+            ) {
+                DebtScreenHelper(navController, context)
             }
         }
     }

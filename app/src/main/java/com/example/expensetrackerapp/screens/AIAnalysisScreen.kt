@@ -91,6 +91,12 @@ fun AIAnalysisScreen(keyPoints: List<String>) {
                     contentDescription = "Go back"
                 )
             }
+
+            Text(
+                text = ":)",
+                modifier = Modifier.align(Alignment.Center)
+            )
+            
             IconButton(
                 onClick = {
                     scope.launch {

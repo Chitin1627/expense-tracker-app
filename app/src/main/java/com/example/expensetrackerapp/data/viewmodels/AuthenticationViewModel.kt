@@ -82,6 +82,7 @@ class AuthenticationViewModel : ViewModel() {
                     onSuccess(token.token)
                 }
             } catch (e: Exception) {
+                println(e.message)
                 withContext(Dispatchers.Main) {
                     onError(e.message ?: "An error occurred")
                 }

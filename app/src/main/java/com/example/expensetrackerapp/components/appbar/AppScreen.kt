@@ -1,6 +1,7 @@
 package com.example.expensetrackerapp.components.appbar
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.CheckCircle
@@ -84,4 +85,11 @@ sealed class AppScreen(
             Icons.Outlined.Star,
             "Analyze with AI"
         )
+
+    object Debts:
+            AppScreen(
+                "Debts",
+                Icons.Default.Info,
+                "Debts"
+            )
 }

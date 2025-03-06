@@ -3,6 +3,7 @@ package com.example.expensetrackerapp.components.appbar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -23,7 +24,8 @@ import com.example.expensetrackerapp.R
 @Composable
 fun MyTopAppBar(
     currentScreen: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onProfileClick: () -> Unit
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -33,6 +35,11 @@ fun MyTopAppBar(
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
+        },
+        actions = {
+                  IconButton(onClick = { onProfileClick() }) {
+                      Icon(imageVector = Icons.Default.Person, contentDescription = "Profile")
+                  }
         },
         modifier = modifier,
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(

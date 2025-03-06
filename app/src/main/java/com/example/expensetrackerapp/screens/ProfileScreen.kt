@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import com.example.expensetrackerapp.R
 import com.example.expensetrackerapp.components.AppAlertDialog
 import com.example.expensetrackerapp.components.AutoResizedText
+import com.example.expensetrackerapp.components.appbar.AppScreen
 import com.example.expensetrackerapp.model.PasswordChangeResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,7 +60,7 @@ fun ProfileScreen(
     email: String,
     changePassword: suspend (String, String) -> PasswordChangeResponse,
     logoutOnClick: () -> Unit,
-    deleteAccount: suspend () -> Boolean
+    deleteAccount: suspend () -> Boolean,
 ) {
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
@@ -352,6 +354,11 @@ fun ProfileScreen(
             confirmPassword = ""
             passwordChangeSuccess = false
             passwordChangeText = ""
+        }
+        DisposableEffect(Unit) {
+            onDispose {
+
+            }
         }
     }
 }

@@ -14,6 +14,7 @@ class RetrofitClient(context: Context) {
     var password: String = "";
 
     private val BASE_URL = "https://expense-tracker-backend-moo6.onrender.com/"
+    //private val BASE_URL = "http://10.0.2.2:8080"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -68,5 +69,9 @@ class RetrofitClient(context: Context) {
 
     val aiAnalyseApi: AIAnalyseApi by lazy {
         retrofit.create(AIAnalyseApi::class.java)
+    }
+
+    val debtApi: DebtApi by lazy {
+        retrofit.create(DebtApi::class.java)
     }
 }

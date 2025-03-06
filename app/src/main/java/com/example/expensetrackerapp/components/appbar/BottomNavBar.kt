@@ -9,7 +9,7 @@ val items = listOf(
     AppScreen.AIAnalyse,
     AppScreen.Home,
     AppScreen.AddExpense,
-    AppScreen.Profile
+    AppScreen.Debts
 )
 @Composable
 fun BottomNavBar(

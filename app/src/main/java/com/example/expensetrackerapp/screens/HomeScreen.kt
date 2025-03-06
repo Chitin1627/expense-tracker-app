@@ -126,7 +126,6 @@ fun HomeScreen(
                             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
                                 append("this month")
                             }
-
                         },
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleSmall
