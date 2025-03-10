@@ -69,7 +69,7 @@ fun DebtCard(
                 .background(
                     brush = Brush.radialGradient(
                         colors = listOf(
-                            if(debt.completed)
+                            if(debt.receivable)
                                 Color(0xFF059212)
                             else
                                 Color.Red,
@@ -89,7 +89,7 @@ fun DebtCard(
                 colors = CardDefaults.cardColors(
                     containerColor = if(!isExpanded || isEditing) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary
                 ),
-                border = BorderStroke(2.dp, color = if(debt.completed) Color(0xFF059212) else Color.Red),
+                border = BorderStroke(2.dp, color = if(debt.receivable) Color(0xFF059212) else Color.Red),
                 onClick = { if(!isEditing) onCardClick(debt._id) }
             ) {
                 Column(
@@ -125,7 +125,7 @@ fun DebtCard(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            if(!debt.receivable || !debt.completed) {
+                            if(!debt.completed) {
                                 Text(
                                     text = "${Char(8377)}${debt.amount?:0.0}",
                                     style = MaterialTheme.typography.titleMedium,

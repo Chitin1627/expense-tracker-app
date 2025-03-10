@@ -204,7 +204,8 @@ fun LoginScreen(
                 Button(
                     onClick = {
                         loginOnClick(username, password)
-                    }
+                    },
+                    enabled = (username!="" && !username.contains(" ") && password!="")
                 ) {
                     Text(text = "Login")
                 }

@@ -57,7 +57,7 @@ fun RegisterScreen(
         mutableStateOf(false)
     }
 
-    enableSignUpButton = (username!="" && password!="" && email.contains("@"))
+    enableSignUpButton = (username!="" && password!="" && email.contains("@") && !username.contains(" "))
 
     Column(
         modifier = Modifier.fillMaxSize(),
