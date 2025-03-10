@@ -12,6 +12,9 @@ import androidx.navigation.NavHostController
 import com.example.expensetrackerapp.components.LoadingAnimation
 import com.example.expensetrackerapp.data.viewmodels.DebtScreenViewModel
 import com.example.expensetrackerapp.screens.DebtScreen
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun DebtScreenHelper(
@@ -31,8 +34,10 @@ fun DebtScreenHelper(
     } else {
         DebtScreen(
             debts = debtScreenViewModel.getDebts(),
-            addDebt = { debt ->
-                debtScreenViewModel.addDebt(debt, context)
+            onDebtDelete = {debtId ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    debtScreenViewModel.deleteExpense(context, debtId)
+                }
             }
         )
     }

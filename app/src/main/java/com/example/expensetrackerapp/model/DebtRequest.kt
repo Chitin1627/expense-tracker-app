@@ -1,13 +1,9 @@
 package com.example.expensetrackerapp.model
 
-data class Debt(
-    val _id: String = "",
-    val userId: String = "",
+data class DebtRequest(
     val otherParty: String = "",
     val amount: Double = 0.0,
     val receivable: Boolean = false,
-    val completed: Boolean = false,
+    val completed: Boolean = true,
     val description: String = "",
-    val created_at: String = ""
 )
-

@@ -92,6 +92,16 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.padding(4.dp))
 
+
+        Text(
+            text = "Don't put any personal information.",
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Spacer(modifier = Modifier.padding(4.dp))
+
         errorMessage?.let {
             Text(
                 text = it,

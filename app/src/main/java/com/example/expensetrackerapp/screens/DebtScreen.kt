@@ -1,98 +1,219 @@
 package com.example.expensetrackerapp.screens
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.*
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.expensetrackerapp.components.CreateDebtComponent
+import com.example.expensetrackerapp.components.DebtCard
+import com.example.expensetrackerapp.data.viewmodels.DebtScreenViewModel
 import com.example.expensetrackerapp.model.Debt
+import com.example.expensetrackerapp.model.DebtRequest
 
 @Composable
 fun DebtScreen(
-    debts: List<Debt>,
-    addDebt: (Debt) -> Unit
+    debts: ArrayList<Debt>,
+    onDebtDelete: (String) -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+    val context = LocalContext.current
+    val debtScreenViewModel: DebtScreenViewModel = viewModel()
+
+    val deletedDebt by remember { mutableStateOf(HashMap<String, Boolean>()) }
+    var expandedCardId by remember { mutableStateOf<String?>(null) }
+    var editingCardId by remember { mutableStateOf<String?>(null) }
+    var showCreateDebtDialog by remember { mutableStateOf(false) }
+    var currentDebt by remember { mutableStateOf<Debt?>(null) }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = "Your Debts",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (debts.isEmpty()) {
-            Text(
-                text = "No debts found",
-                style = MaterialTheme.typography.bodyLarge
-            )
-        } else {
-            LazyColumn {
-                items(debts) { debt ->
-                    DebtItem(debt)
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            if (debts.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(debts) { debt ->
+                        println(debt)
+                        if (!deletedDebt.containsKey(debt._id)) {
+                            DebtCard(
+                                debt = debt,
+                                isExpanded = expandedCardId == debt._id,
+                                isEditing = editingCardId == debt._id,
+                                isClickable = editingCardId == null,
+                                onEditClick = { debtId ->
+                                    currentDebt = debts.find { it._id == debtId } // Set the selected debt
+                                    showCreateDebtDialog = true
+                                },
+                                onCancelClick = {
+                                    editingCardId = null
+                                },
+                                onCardClick = { debtId ->
+                                    println(debtId)
+                                    expandedCardId =
+                                        if (expandedCardId == debtId) null else debtId
+                                },
+                                onDeleteClick = { debtId ->
+                                    onDebtDelete(debtId)
+                                    deletedDebt[debtId] = true
+                                },
+                                onSave = { debtId, amount, otherParty, description, completed, receivable ->
+                                    val editedDebt: Debt = Debt(
+                                        _id = debtId,
+                                        amount = amount,
+                                        otherParty = otherParty,
+                                        description = description,
+                                        completed = completed,
+                                        receivable = receivable
+                                    )
+                                    println(editedDebt)
+                                    debtScreenViewModel.setEditedDebt(editedDebt)
+                                    try {
+                                        val success = debtScreenViewModel.editDebt(context)
+                                        if (success) {
+                                            val index = debts.indexOfFirst { it._id == debtId }
+                                            if (index != -1) {
+                                                debts[index] = debts[index].copy(
+                                                    amount = amount,
+                                                    otherParty = otherParty,
+                                                    description = description,
+                                                    completed = completed,
+                                                    receivable = receivable
+                                                )
+                                            }
+                                        }
+                                        success
+                                    } catch (e: Exception) {
+                                        false
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Nothing to see here :(",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
         Button(
             onClick = {
-                addDebt(
-                    Debt(
-                        id = null,
-                        userId = "USER_ID_HERE", // Replace with actual user ID
-                        otherParty = "John Doe",
-                        amount = 50.0,
-                        isReceivable = false,
-                    )
-                )
+                currentDebt = null // Reset for a new debt
+                showCreateDebtDialog = true
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF059212)
+            )
         ) {
-            Text("Add Sample Debt", style = MaterialTheme.typography.bodyLarge)
+            Text(text = "+")
         }
     }
-}
 
-@Composable
-fun DebtItem(debt: Debt) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "Other Party: ${debt.otherParty}",
-                style = MaterialTheme.typography.headlineMedium
-            )
-            Text(
-                text = "Amount: $${debt.amount}",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-                text = "Date: ${debt.createdDate}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "Type: ${if (debt.isReceivable) "Receivable" else "Owed"}",
-                color = if (debt.isReceivable) Color.Green else Color.Red,
-                style = MaterialTheme.typography.bodyLarge
-            )
+    if (showCreateDebtDialog) {
+        println("Current Debt: $currentDebt") // Debugging
+        Dialog(
+            onDismissRequest = { },
+            properties = DialogProperties()
+        ) {
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.background,
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+            ) {
+                CreateDebtComponent(
+                    onSave = { debtId, amount, otherParty, description, completed, receivable ->
+                        val success = if (currentDebt == null) {
+                            val debt = DebtRequest(
+                                amount = amount,
+                                otherParty = otherParty,
+                                description = description,
+                                completed = completed,
+                                receivable = receivable
+                            )
+                            println("ADD DEBT " + debt)
+                            val newDebt = debtScreenViewModel.addDebt(debt, context)
+                            if (newDebt._id != "") {
+                                debts.add(newDebt)
+                                true
+                            } else false
+                        } else {
+                            val debt = Debt(
+                                _id = debtId,
+                                amount = amount,
+                                otherParty = otherParty,
+                                description = description,
+                                completed = completed,
+                                receivable = receivable
+                            )
+                            debtScreenViewModel.setEditedDebt(debt)
+                            val suc = debtScreenViewModel.editDebt(context)
+                            if (suc) {
+                                val index = debts.indexOfFirst { it._id == debtId }
+                                if (index != -1) {
+                                    debts[index] = debts[index].copy(
+                                        amount = amount,
+                                        otherParty = otherParty,
+                                        description = description,
+                                        completed = completed,
+                                        receivable = receivable
+                                    )
+                                }
+                                currentDebt = null // Reset after editing
+                            }
+                            suc
+                        }
+                        if (success) {
+                            showCreateDebtDialog = false
+                        }
+                        success
+                    },
+                    onDismiss = {
+                        showCreateDebtDialog = false
+                        currentDebt = null
+                    },
+                    debtId = currentDebt?._id ?: "",
+                    currentAmount = currentDebt?.amount?.toString() ?: "",
+                    currentOtherParty = currentDebt?.otherParty ?: "",
+                    currentDescription = currentDebt?.description ?: "",
+                    currentReceivable = currentDebt?.receivable ?: false,
+                    currentCompleted = currentDebt?.completed ?: false
+                )
+            }
         }
     }
 }

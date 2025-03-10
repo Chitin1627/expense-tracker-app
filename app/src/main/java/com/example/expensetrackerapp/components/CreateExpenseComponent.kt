@@ -252,7 +252,7 @@ fun CreateExpenseComponent(
                             onDismiss()
                         }
                         else {
-                            errorMessage = "Failed to save expense. Please try again"
+                            errorMessage = "Failed to save debt. Please try again"
                         }
                     }
                 },

@@ -28,6 +28,11 @@
 -dontwarn okhttp3.**
 -keep class okhttp3.** { *; }
 
+-keep class com.example.expensetrackerapp.** { *; }
+-keep class kotlinx.coroutines.** { *; }
+-keep class io.ktor.** { *; }
+-keep class com.google.gson.** { *; }
+
 -dontwarn com.google.errorprone.annotations.CanIgnoreReturnValue
 -dontwarn com.google.errorprone.annotations.CheckReturnValue
 -dontwarn com.google.errorprone.annotations.Immutable
